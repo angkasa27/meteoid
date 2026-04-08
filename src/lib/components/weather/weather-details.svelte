@@ -13,15 +13,11 @@
 	const next24 = $derived(hourly.slice(0, 8));
 
 	const avgHumidity = $derived(
-		next24.length
-			? Math.round(next24.reduce((s, h) => s + h.humidity, 0) / next24.length)
-			: 0
+		next24.length ? Math.round(next24.reduce((s, h) => s + h.humidity, 0) / next24.length) : 0
 	);
 	const maxWind = $derived(next24.reduce((max, h) => Math.max(max, h.windSpeedKmh), 0));
 	const avgTemp = $derived(
-		next24.length
-			? Math.round(next24.reduce((s, h) => s + h.temperature, 0) / next24.length)
-			: 0
+		next24.length ? Math.round(next24.reduce((s, h) => s + h.temperature, 0) / next24.length) : 0
 	);
 
 	// SVG sparkline for temperature over next 24h
@@ -116,7 +112,7 @@
 
 		<!-- Metrics grid -->
 		<div class="grid grid-cols-2 gap-3">
-			{#each metrics as metric}
+			{#each metrics as metric (metric.label)}
 				<div class="rounded-xl bg-white/4 p-3">
 					<div class="mb-1.5 flex items-center gap-1.5">
 						<span class="text-base">{metric.icon}</span>

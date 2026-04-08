@@ -39,7 +39,7 @@
 
 <!-- Gradient background -->
 <div
-	class="min-h-dvh bg-bg-base relative overflow-x-hidden"
+	class="relative min-h-dvh overflow-x-hidden bg-bg-base"
 	style="background: radial-gradient(ellipse at 20% 0%, oklch(0.18 0.06 260) 0%, transparent 60%),
 		   radial-gradient(ellipse at 80% 100%, oklch(0.16 0.05 230) 0%, transparent 60%),
 		   var(--bg-base);"

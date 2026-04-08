@@ -234,9 +234,9 @@
 	<!-- Panel -->
 	<div
 		transition:fly={{ y: 48, duration: 300, opacity: 0 }}
-		class="fixed bottom-0 left-0 right-0 z-50 flex max-h-[92dvh] flex-col
+		class="fixed right-0 bottom-0 left-0 z-50 flex max-h-[92dvh] flex-col
 			   rounded-t-2xl border-t border-white/10 bg-[oklch(0.15_0.025_260)]
-			   lg:bottom-auto lg:top-0 lg:left-auto lg:right-0 lg:h-full lg:max-h-full
+			   lg:top-0 lg:right-0 lg:bottom-auto lg:left-auto lg:h-full lg:max-h-full
 			   lg:w-[400px] lg:rounded-none lg:rounded-l-2xl lg:border-t-0 lg:border-l"
 		role="dialog"
 		aria-modal="true"
@@ -257,7 +257,12 @@
 				aria-label="Tutup"
 			>
 				<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -276,37 +281,85 @@
 			>
 				{#if geoState === 'loading' || geoState === 'matching'}
 					<svg class="h-5 w-5 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+						/>
 					</svg>
 					<span class="text-sm font-medium">
 						{geoState === 'loading' ? 'Mendeteksi lokasi…' : 'Mencocokkan wilayah…'}
 					</span>
 				{:else if geoState === 'error'}
-					<svg class="h-5 w-5 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+					<svg
+						class="h-5 w-5 shrink-0 text-red-400"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+						/>
 					</svg>
 					<div class="flex-1 text-left">
 						<div class="text-sm font-medium text-red-300">Gagal mendeteksi</div>
 						<div class="mt-0.5 text-xs text-red-400/70">{geoError}</div>
 					</div>
-					<svg class="h-4 w-4 shrink-0 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9" />
+					<svg
+						class="h-4 w-4 shrink-0 opacity-60"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9"
+						/>
 					</svg>
 				{:else}
 					<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+						/>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+						/>
 					</svg>
 					<div class="flex-1 text-left">
 						<div class="text-sm font-medium">Gunakan Lokasi Saat Ini</div>
 						<div class="mt-0.5 text-xs opacity-60">Deteksi otomatis via GPS</div>
 					</div>
-					<svg class="h-4 w-4 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5"
-						fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+					<svg
+						class="h-4 w-4 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 5l7 7-7 7"
+						/>
 					</svg>
 				{/if}
 			</button>
@@ -323,11 +376,18 @@
 
 			<div class="relative">
 				<svg
-					class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
-					fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"
+					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-muted"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-hidden="true"
 				>
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
 				</svg>
 				<input
 					bind:this={inputEl}
@@ -338,20 +398,31 @@
 					onkeydown={handleKeydown}
 					autocomplete="off"
 					spellcheck="false"
-					class="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-9 pr-9 text-sm
-						   text-text-primary placeholder:text-text-muted
-						   focus:border-accent/50 focus:bg-white/8 focus:outline-none focus:ring-1 focus:ring-accent/20
-						   transition-all duration-150"
+					class="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pr-9 pl-9 text-sm
+						   text-text-primary transition-all
+						   duration-150 placeholder:text-text-muted focus:border-accent/50 focus:bg-white/8 focus:ring-1
+						   focus:ring-accent/20 focus:outline-none"
 				/>
 				{#if query}
 					<button
 						onclick={clearSearch}
-						class="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center
+						class="absolute top-1/2 right-2.5 flex h-5 w-5 -translate-y-1/2 items-center justify-center
 							   rounded-full bg-white/10 text-text-muted hover:bg-white/15 hover:text-text-secondary"
 						aria-label="Hapus pencarian"
 					>
-						<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+						<svg
+							class="h-3 w-3"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M6 18L18 6M6 6l12 12"
+							/>
 						</svg>
 					</button>
 				{/if}
@@ -359,10 +430,21 @@
 
 			<!-- Loading indicator -->
 			{#if regionsStore.loading}
-				<p class="mt-2 text-xs text-text-muted flex items-center gap-1.5">
+				<p class="mt-2 flex items-center gap-1.5 text-xs text-text-muted">
 					<svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+						/>
 					</svg>
 					Memuat data 91.000+ wilayah…
 				</p>
@@ -373,11 +455,10 @@
 
 		<!-- ── Scrollable results area ────────────────────────────────────────── -->
 		<div class="flex-1 overflow-y-auto px-4 pb-6">
-
 			<!-- GPS match candidates -->
 			{#if geoMatches.length > 0}
 				<div class="mb-1">
-					<p class="mb-2 text-xs font-medium uppercase tracking-wide text-text-muted">
+					<p class="mb-2 text-xs font-medium tracking-wide text-text-muted uppercase">
 						📍 Wilayah Terdekat
 					</p>
 					<div class="flex flex-col gap-1">
@@ -385,12 +466,26 @@
 							<button
 								onclick={() => selectResult(r)}
 								class="flex w-full items-start gap-3 rounded-xl border border-white/6 bg-accent/5 px-3 py-2.5 text-left
-									   hover:border-accent/25 hover:bg-accent/10 transition-all duration-150"
+									   transition-all duration-150 hover:border-accent/25 hover:bg-accent/10"
 							>
-								<svg class="mt-0.5 h-4 w-4 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-										d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+								<svg
+									class="mt-0.5 h-4 w-4 shrink-0 text-accent"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+									/>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+									/>
 								</svg>
 								<div class="min-w-0 flex-1">
 									<div class="truncate text-sm font-medium text-text-primary">{r.villageName}</div>
@@ -407,7 +502,9 @@
 			<!-- Search results -->
 			{#if showSearch}
 				{#if searchResults.length > 0}
-					<p class="mb-2 text-xs text-text-muted">{searchResults.length} kelurahan/desa ditemukan</p>
+					<p class="mb-2 text-xs text-text-muted">
+						{searchResults.length} kelurahan/desa ditemukan
+					</p>
 					<ul role="listbox" class="flex flex-col gap-1">
 						{#each searchResults as r, i (r.villageCode)}
 							<li>
@@ -422,26 +519,62 @@
 									aria-selected={focusedIndex === i}
 								>
 									<!-- Location pin icon -->
-									<svg class="mt-0.5 h-4 w-4 shrink-0 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-											d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+									<svg
+										class="mt-0.5 h-4 w-4 shrink-0 text-text-muted"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+										/>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+										/>
 									</svg>
 									<div class="min-w-0 flex-1">
 										<!-- Village name with highlight -->
-										<div class="truncate text-sm font-medium text-text-primary">{@html highlight(r.villageName, query)}</div>
+										<div class="truncate text-sm font-medium text-text-primary">
+											{@html highlight(r.villageName, query)}
+										</div>
 										<!-- Breadcrumb path -->
 										<div class="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
 											<span class="truncate">{r.districtName}</span>
 											{#if r.regencyName}
-												<svg class="h-2.5 w-2.5 shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+												<svg
+													class="h-2.5 w-2.5 shrink-0 opacity-40"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M9 5l7 7-7 7"
+													/>
 												</svg>
 												<span class="truncate">{r.regencyName}</span>
 											{/if}
 											{#if r.provinceName}
-												<svg class="h-2.5 w-2.5 shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+												<svg
+													class="h-2.5 w-2.5 shrink-0 opacity-40"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M9 5l7 7-7 7"
+													/>
 												</svg>
 												<span class="truncate opacity-70">{r.provinceName}</span>
 											{/if}
@@ -453,36 +586,49 @@
 					</ul>
 				{:else if !regionsStore.loading && !isSearching}
 					<div class="py-8 text-center">
-						<p class="text-2xl mb-2">🔍</p>
-						<p class="text-sm text-text-muted">Tidak ada hasil untuk <strong class="text-text-secondary">"{query}"</strong></p>
+						<p class="mb-2 text-2xl">🔍</p>
+						<p class="text-sm text-text-muted">
+							Tidak ada hasil untuk <strong class="text-text-secondary">"{query}"</strong>
+						</p>
 						<p class="mt-1 text-xs text-text-muted">Coba nama lain atau ejaan yang berbeda</p>
 					</div>
 				{/if}
 
-			<!-- Recent locations -->
+				<!-- Recent locations -->
 			{:else if showRecent}
 				{#if regionsStore.recentLocations.length > 0}
 					<div class="mb-4">
 						<div class="mb-2 flex items-center justify-between">
-							<p class="text-xs font-medium uppercase tracking-wide text-text-muted">Riwayat</p>
+							<p class="text-xs font-medium tracking-wide text-text-muted uppercase">Riwayat</p>
 							<button
 								onclick={() => regionsStore.clearRecent()}
-								class="text-xs text-text-muted hover:text-text-secondary transition-colors"
+								class="text-xs text-text-muted transition-colors hover:text-text-secondary"
 							>
 								Hapus semua
 							</button>
 						</div>
 						<div class="flex flex-col gap-1">
 							{#each regionsStore.recentLocations as r (r.code)}
-								<div class="group flex items-center gap-2 rounded-xl border border-white/5 bg-white/3 px-3 py-2.5
-									        hover:border-white/10 hover:bg-white/6 transition-all duration-100">
+								<div
+									class="group flex items-center gap-2 rounded-xl border border-white/5 bg-white/3 px-3 py-2.5
+									        transition-all duration-100 hover:border-white/10 hover:bg-white/6"
+								>
 									<button
 										onclick={() => selectRecent(r)}
-										class="flex flex-1 items-center gap-3 text-left min-w-0"
+										class="flex min-w-0 flex-1 items-center gap-3 text-left"
 									>
-										<svg class="h-4 w-4 shrink-0 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-												d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+										<svg
+											class="h-4 w-4 shrink-0 text-text-muted"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
 										</svg>
 										<div class="min-w-0 flex-1">
 											<div class="truncate text-sm font-medium text-text-primary">{r.name}</div>
@@ -491,12 +637,17 @@
 									</button>
 									<button
 										onclick={() => regionsStore.removeRecent(r.code)}
-										class="h-6 w-6 shrink-0 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100
-											   text-text-muted hover:text-text-secondary transition-all"
+										class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-muted opacity-0
+											   transition-all group-hover:opacity-100 hover:text-text-secondary"
 										aria-label="Hapus {r.name}"
 									>
 										<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M6 18L18 6M6 6l12 12"
+											/>
 										</svg>
 									</button>
 								</div>
@@ -507,12 +658,20 @@
 
 				<!-- Tips -->
 				<div class="rounded-xl bg-white/3 px-4 py-3.5">
-					<p class="text-xs font-medium text-text-secondary mb-2">💡 Tips</p>
+					<p class="mb-2 text-xs font-medium text-text-secondary">💡 Tips</p>
 					<ul class="space-y-1.5 text-xs text-text-muted">
-						<li class="flex gap-2"><span>•</span><span>Ketik nama kelurahan / desa di atas</span></li>
-						<li class="flex gap-2"><span>•</span><span>Minimal 2 karakter untuk mulai pencarian</span></li>
-						<li class="flex gap-2"><span>•</span><span>Gunakan ↑↓ untuk navigasi keyboard</span></li>
-						<li class="flex gap-2"><span>•</span><span>Mencakup 91.000+ wilayah seluruh Indonesia</span></li>
+						<li class="flex gap-2">
+							<span>•</span><span>Ketik nama kelurahan / desa di atas</span>
+						</li>
+						<li class="flex gap-2">
+							<span>•</span><span>Minimal 2 karakter untuk mulai pencarian</span>
+						</li>
+						<li class="flex gap-2">
+							<span>•</span><span>Gunakan ↑↓ untuk navigasi keyboard</span>
+						</li>
+						<li class="flex gap-2">
+							<span>•</span><span>Mencakup 91.000+ wilayah seluruh Indonesia</span>
+						</li>
 					</ul>
 				</div>
 			{/if}

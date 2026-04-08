@@ -38,14 +38,14 @@
 				<div class="flex items-center gap-3">
 					<WeatherIcon category={day.category} size={22} />
 
-					<div class="flex-1 min-w-0">
+					<div class="min-w-0 flex-1">
 						<span class="text-sm font-medium {isToday ? 'text-accent' : 'text-text-primary'}">
 							{isToday ? 'Hari ini' : day.label}
 						</span>
 						<span class="ml-2 text-xs text-text-muted">{day.dominantWeather}</span>
 					</div>
 
-					<div class="flex items-center gap-3 text-sm shrink-0">
+					<div class="flex shrink-0 items-center gap-3 text-sm">
 						<span class="text-text-muted">{day.minTemp}°</span>
 						<div class="h-1.5 w-12 overflow-hidden rounded-full bg-white/10">
 							<div
@@ -55,13 +55,20 @@
 						</div>
 						<span class="font-medium text-text-primary">{day.maxTemp}°</span>
 						<svg
-							class="h-4 w-4 text-text-muted transition-transform duration-200 {isExpanded ? 'rotate-180' : ''}"
+							class="h-4 w-4 text-text-muted transition-transform duration-200 {isExpanded
+								? 'rotate-180'
+								: ''}"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
 							aria-hidden="true"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 				</div>
@@ -71,7 +78,9 @@
 				<div transition:slide={{ duration: 250 }} class="bg-white/2 px-4 pb-3 sm:px-5">
 					<div class="no-scrollbar flex gap-2 overflow-x-auto pt-2">
 						{#each day.hourly as h (h.timeStr)}
-							<div class="flex min-w-[56px] flex-col items-center gap-1.5 rounded-lg bg-white/4 p-2">
+							<div
+								class="flex min-w-[56px] flex-col items-center gap-1.5 rounded-lg bg-white/4 p-2"
+							>
 								<span class="text-xs text-text-muted">{h.timeStr}</span>
 								<WeatherIcon category={h.category} size={18} />
 								<span class="text-xs font-semibold text-text-primary">{h.temperature}°</span>

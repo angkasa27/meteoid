@@ -74,12 +74,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			district: addr.city_district ?? addr.district ?? null,
 
 			// Village / kelurahan / desa
-			village:
-				addr.village ??
-				addr.hamlet ??
-				addr.suburb ??
-				addr.neighbourhood ??
-				null,
+			village: addr.village ?? addr.hamlet ?? addr.suburb ?? addr.neighbourhood ?? null,
 
 			// Full display name for UI
 			displayName: data.display_name ?? null,

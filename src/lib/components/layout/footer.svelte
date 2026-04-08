@@ -34,7 +34,9 @@
 						rel="noopener noreferrer"
 						class="group flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-accent"
 					>
-						<ExternalLink class="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+						<ExternalLink
+							class="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+						/>
 						<span>API BMKG (api.bmkg.go.id)</span>
 					</a>
 					<p class="text-xs leading-loose text-text-muted">
@@ -64,8 +66,18 @@
 						rel="noopener noreferrer"
 						class="flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-accent"
 					>
-						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+						<svg
+							class="h-4 w-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path
+								d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+							/>
 							<path d="M9 18c-4.51 2-5-2-7-2" />
 						</svg>
 						<span>Source Code</span>
@@ -74,10 +86,12 @@
 			</div>
 		</div>
 
-    <!-- Disclaimer -->
+		<!-- Disclaimer -->
 		<div class="glass mt-8 rounded-2xl p-4 text-center">
-			<p class="text-[10px] uppercase tracking-wider text-text-secondary font-bold mb-1 opacity-50">Disclaimer</p>
-			<p class="text-xs leading-relaxed text-text-muted max-w-2xl mx-auto">
+			<p class="mb-1 text-[10px] font-bold tracking-wider text-text-secondary uppercase opacity-50">
+				Disclaimer
+			</p>
+			<p class="mx-auto max-w-2xl text-xs leading-relaxed text-text-muted">
 				Aplikasi ini menggunakan data dari API publik BMKG. Selalu rujuk ke website resmi BMKG untuk
 				informasi cuaca yang lebih akurat dan terkini, terutama untuk peringatan cuaca ekstrem atau
 				kondisi darurat.
@@ -101,7 +115,7 @@
 						href="https://asaa.dev"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="font-medium text-text-primary transition-colors hover:text-accent underline decoration-white/10 underline-offset-2"
+						class="font-medium text-text-primary underline decoration-white/10 underline-offset-2 transition-colors hover:text-accent"
 					>
 						Dimas Angkasa
 					</a>
@@ -116,7 +130,5 @@
 				</span> -->
 			</div>
 		</div>
-
-
 	</div>
 </footer>

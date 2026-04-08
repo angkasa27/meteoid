@@ -68,11 +68,13 @@ export interface RegionNode {
 	level: RegionLevel;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface Province extends RegionNode {
 	level: 'province';
 	regencies: Regency[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface Regency extends RegionNode {
 	level: 'regency';
 	parentProvinceCode: string;

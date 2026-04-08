@@ -45,13 +45,15 @@
 		{#each visible as alert (alert.id)}
 			<div
 				transition:slide={{ duration: 200 }}
-				class="rounded-xl border border-white/8 border-l-4 {borderColor[alert.severity]} {bgColor[alert.severity]} overflow-hidden"
+				class="rounded-xl border border-l-4 border-white/8 {borderColor[alert.severity]} {bgColor[
+					alert.severity
+				]} overflow-hidden"
 			>
 				<!-- Header row: clickable area + dismiss button -->
 				<div class="flex items-center justify-between gap-2 px-4 py-3">
 					<!-- Left: expand toggle (not a button to avoid nesting) -->
 					<div
-						class="flex flex-1 cursor-pointer items-center gap-2 min-w-0"
+						class="flex min-w-0 flex-1 cursor-pointer items-center gap-2"
 						role="button"
 						tabindex="0"
 						aria-expanded={expanded.has(alert.id)}
@@ -61,10 +63,22 @@
 						<Badge severity={alert.severity} label={alert.severity.toUpperCase()} />
 						<span class="truncate text-sm font-medium text-text-primary">{alert.title}</span>
 						<svg
-							class="ml-auto h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 {expanded.has(alert.id) ? 'rotate-180' : ''}"
-							fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"
+							class="ml-auto h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 {expanded.has(
+								alert.id
+							)
+								? 'rotate-180'
+								: ''}"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 
@@ -74,8 +88,19 @@
 						onclick={() => dismiss(alert.id)}
 						aria-label="Tutup peringatan {alert.title}"
 					>
-						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						<svg
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
 						</svg>
 					</button>
 				</div>

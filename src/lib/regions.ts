@@ -1,14 +1,6 @@
-import type {
-	Province,
-	Regency,
-	District,
-	Village,
-	RegionHierarchy,
-	RegionPath
-} from './types.js';
+import type { Province, Regency, District, Village, RegionHierarchy, RegionPath } from './types.js';
 
 export type { RegionHierarchy, RegionPath };
-
 
 // ─── Parsers ──────────────────────────────────────────────────────────────────
 
@@ -198,11 +190,7 @@ export interface SearchResult {
 	displayName: string;
 }
 
-export const searchVillages = (
-	h: RegionHierarchy,
-	query: string,
-	limit = 20
-): SearchResult[] => {
+export const searchVillages = (h: RegionHierarchy, query: string, limit = 20): SearchResult[] => {
 	if (!query.trim()) return [];
 	const q = query.toLowerCase().trim();
 	const results: SearchResult[] = [];

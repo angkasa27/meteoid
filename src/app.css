@@ -11,7 +11,7 @@
 	/* Background layers */
 	--bg-base: oklch(0.12 0.02 260);
 	--bg-surface: oklch(0.16 0.025 260);
-	--bg-elevated: oklch(0.20 0.03 260);
+	--bg-elevated: oklch(0.2 0.03 260);
 
 	/* Glass effect */
 	--glass-bg: oklch(1 0 0 / 5%);
@@ -30,14 +30,14 @@
 
 	/* Weather semantic */
 	--color-cold: oklch(0.65 0.18 240);
-	--color-cool: oklch(0.60 0.15 210);
+	--color-cool: oklch(0.6 0.15 210);
 	--color-warm: oklch(0.72 0.17 70);
 	--color-hot: oklch(0.65 0.22 30);
 
 	/* Alert severity */
-	--alert-info: oklch(0.60 0.16 230);
+	--alert-info: oklch(0.6 0.16 230);
 	--alert-warning: oklch(0.72 0.18 75);
-	--alert-danger: oklch(0.68 0.20 40);
+	--alert-danger: oklch(0.68 0.2 40);
 	--alert-critical: oklch(0.58 0.25 25);
 }
 
@@ -109,7 +109,9 @@
 	}
 
 	.glow-accent {
-		box-shadow: 0 0 20px var(--accent-glow), 0 0 60px var(--accent-glow);
+		box-shadow:
+			0 0 20px var(--accent-glow),
+			0 0 60px var(--accent-glow);
 	}
 
 	.text-gradient {

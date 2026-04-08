@@ -35,9 +35,7 @@
 				<p class="text-sm font-medium text-text-secondary">📍 {locationName}</p>
 				<p class="mt-0.5 text-xs text-text-muted">{now} · Data BMKG</p>
 			</div>
-			<div class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-				Live
-			</div>
+			<div class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">Live</div>
 		</div>
 
 		<!-- Main temp + icon -->

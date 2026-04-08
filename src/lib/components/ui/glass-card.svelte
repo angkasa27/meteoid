@@ -12,12 +12,14 @@
 
 	let { class: cls = '', children, hover = false, glow = false, padding = 'md' }: Props = $props();
 
-	const padClass = $derived({
-		none: '',
-		sm: 'p-3',
-		md: 'p-4 sm:p-5',
-		lg: 'p-5 sm:p-7'
-	}[padding]);
+	const padClass = $derived(
+		{
+			none: '',
+			sm: 'p-3',
+			md: 'p-4 sm:p-5',
+			lg: 'p-5 sm:p-7'
+		}[padding]
+	);
 </script>
 
 <div

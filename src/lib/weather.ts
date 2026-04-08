@@ -1,5 +1,4 @@
 import type {
-	WeatherItem,
 	WeatherResponse,
 	ProcessedWeatherData,
 	DailyForecast,
@@ -196,8 +195,7 @@ const ALERT_DEFS: AlertDef[] = [
 		severity: 'danger',
 		title: 'Potensi Hujan Lebat',
 		description: 'Kelembapan tinggi dan kondisi cuaca menunjukkan potensi hujan lebat.',
-		advice:
-			'Siapkan jas hujan atau payung. Waspadai genangan air dan banjir di daerah rendah.',
+		advice: 'Siapkan jas hujan atau payung. Waspadai genangan air dan banjir di daerah rendah.',
 		check: (d) => d.some((h) => h.humidity > 90 && h.category === 'rain')
 	},
 	{
@@ -223,8 +221,7 @@ const ALERT_DEFS: AlertDef[] = [
 		severity: 'warning',
 		title: 'Visibilitas Rendah',
 		description: 'Kabut atau kondisi berasap dapat mengurangi jarak pandang.',
-		advice:
-			'Nyalakan lampu kabut saat berkendara. Kurangi kecepatan dan tingkatkan jarak aman.',
+		advice: 'Nyalakan lampu kabut saat berkendara. Kurangi kecepatan dan tingkatkan jarak aman.',
 		check: (d) => d.some((h) => h.category === 'fog')
 	},
 	{
@@ -243,13 +240,15 @@ const ALERT_DEFS: AlertDef[] = [
 export const generateAlerts = (data: ProcessedWeatherData[]): WeatherAlert[] => {
 	// Only check the next 24 hours
 	const next24h = data.slice(0, 8);
-	return ALERT_DEFS.filter((def) => def.check(next24h)).map(({ id, severity, title, description, advice }) => ({
-		id,
-		severity,
-		title,
-		description,
-		advice
-	}));
+	return ALERT_DEFS.filter((def) => def.check(next24h)).map(
+		({ id, severity, title, description, advice }) => ({
+			id,
+			severity,
+			title,
+			description,
+			advice
+		})
+	);
 };
 
 // ─── Temperature color ────────────────────────────────────────────────────────
