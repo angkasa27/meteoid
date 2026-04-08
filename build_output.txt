@@ -1,0 +1,30 @@
+
+> tmp-svelte-setup@0.0.1 build /Users/angkasa/Dwipa/project/dwipatelco-web
+> vite build
+
+vite v7.3.1 building ssr environment for production...
+transforming...
+2:13:22 PM [vite-plugin-svelte] src/lib/components/fragments/sections/hero/hero-image.svelte:63:1 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+61:   <div class="hidden md:block"></div>
+62: 
+63:   <div 
+           ^
+64:     class="w-full relative touch-pan-y overflow-hidden h-[400px] md:h-[600px] flex items-center justify-center cursor-grab active:cursor-grabbing"
+65:     role="region"
+✓ 4015 modules transformed.
+rendering chunks...
+
+node:internal/event_target:1101
+  process.nextTick(() => { throw err; });
+                           ^
+Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at new Resend (file:///Users/angkasa/Dwipa/project/dwipatelco-web/node_modules/.pnpm/resend@6.10.0/node_modules/resend/dist/index.mjs:920:25)
+    at file:///Users/angkasa/Dwipa/project/dwipatelco-web/.svelte-kit/output/server/entries/endpoints/api/contact/_server.ts.js:111:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:303:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:663:26)
+    at async analyse (file:///Users/angkasa/Dwipa/project/dwipatelco-web/node_modules/.pnpm/@sveltejs+kit@2.56.1_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.55.1_vite@7.3.1_@types_cdac99557dedb188e8aa784f7683cefd/node_modules/@sveltejs/kit/src/core/postbuild/analyse.js:109:62)
+    at async MessagePort.<anonymous> (file:///Users/angkasa/Dwipa/project/dwipatelco-web/node_modules/.pnpm/@sveltejs+kit@2.56.1_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.55.1_vite@7.3.1_@types_cdac99557dedb188e8aa784f7683cefd/node_modules/@sveltejs/kit/src/utils/fork.js:23:16)
+
+Node.js v24.0.1
+ ELIFECYCLE  Command failed with exit code 1.

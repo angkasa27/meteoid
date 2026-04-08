@@ -1,0 +1,186 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* ─── Dark mode via class ─────────────────────────────────────────── */
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Design tokens ───────────────────────────────────────────────── */
+:root {
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+	/* Background layers */
+	--bg-base: oklch(0.12 0.02 260);
+	--bg-surface: oklch(0.16 0.025 260);
+	--bg-elevated: oklch(0.20 0.03 260);
+
+	/* Glass effect */
+	--glass-bg: oklch(1 0 0 / 5%);
+	--glass-border: oklch(1 0 0 / 10%);
+	--glass-bg-hover: oklch(1 0 0 / 8%);
+
+	/* Accent — sky blue */
+	--accent: oklch(0.68 0.18 230);
+	--accent-dim: oklch(0.68 0.18 230 / 20%);
+	--accent-glow: oklch(0.68 0.18 230 / 10%);
+
+	/* Text */
+	--text-primary: oklch(0.95 0.005 250);
+	--text-secondary: oklch(0.65 0.01 250);
+	--text-muted: oklch(0.45 0.01 250);
+
+	/* Weather semantic */
+	--color-cold: oklch(0.65 0.18 240);
+	--color-cool: oklch(0.60 0.15 210);
+	--color-warm: oklch(0.72 0.17 70);
+	--color-hot: oklch(0.65 0.22 30);
+
+	/* Alert severity */
+	--alert-info: oklch(0.60 0.16 230);
+	--alert-warning: oklch(0.72 0.18 75);
+	--alert-danger: oklch(0.68 0.20 40);
+	--alert-critical: oklch(0.58 0.25 25);
+}
+
+@theme inline {
+	--color-bg-base: var(--bg-base);
+	--color-bg-surface: var(--bg-surface);
+	--color-bg-elevated: var(--bg-elevated);
+	--color-glass: var(--glass-bg);
+	--color-glass-border: var(--glass-border);
+	--color-accent: var(--accent);
+	--color-accent-dim: var(--accent-dim);
+	--color-text-primary: var(--text-primary);
+	--color-text-secondary: var(--text-secondary);
+	--color-text-muted: var(--text-muted);
+	--color-cold: var(--color-cold);
+	--color-warm: var(--color-warm);
+	--color-hot: var(--color-hot);
+	--color-alert-info: var(--alert-info);
+	--color-alert-warning: var(--alert-warning);
+	--color-alert-danger: var(--alert-danger);
+	--color-alert-critical: var(--alert-critical);
+	--font-family-sans: var(--font-sans);
+	--radius-card: 1rem;
+	--radius-pill: 9999px;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────── */
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		overflow-x: hidden;
+		scroll-behavior: smooth;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	body {
+		font-family: var(--font-sans);
+		background: var(--bg-base);
+		color: var(--text-primary);
+		min-height: 100dvh;
+		overflow-x: hidden;
+	}
+
+	/* Focus rings */
+	:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+}
+
+/* ─── Utilities ───────────────────────────────────────────────────── */
+@layer utilities {
+	.glass {
+		background: var(--glass-bg);
+		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		border: 1px solid var(--glass-border);
+	}
+
+	.glass-hover:hover {
+		background: var(--glass-bg-hover);
+	}
+
+	.glow-accent {
+		box-shadow: 0 0 20px var(--accent-glow), 0 0 60px var(--accent-glow);
+	}
+
+	.text-gradient {
+		background: linear-gradient(135deg, var(--text-primary), var(--accent));
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	.scrollbar-thin {
+		scrollbar-width: thin;
+		scrollbar-color: oklch(1 0 0 / 15%) transparent;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar {
+		height: 4px;
+		width: 4px;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-thumb {
+		background: oklch(1 0 0 / 20%);
+		border-radius: 9999px;
+	}
+
+	.no-scrollbar {
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/* ─── Keyframes ───────────────────────────────────────────────────── */
+@keyframes fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+.animate-fade-up {
+	animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		oklch(1 0 0 / 5%) 25%,
+		oklch(1 0 0 / 10%) 50%,
+		oklch(1 0 0 / 5%) 75%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.8s ease-in-out infinite;
+	border-radius: 0.5rem;
+}

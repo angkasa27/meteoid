@@ -1,0 +1,12 @@
+.git
+.gitignore
+.dockerignore
+node_modules
+.svelte-kit
+build
+next-backup
+.env
+.env.*
+!.env.example
+README.md
+DOKPLOY.md

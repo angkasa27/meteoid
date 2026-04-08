@@ -1,292 +1,229 @@
-export const defaultRegionCode = "36.71.01.1003";
+import type {
+	Province,
+	Regency,
+	District,
+	Village,
+	RegionHierarchy,
+	RegionPath
+} from './types.js';
 
-export type RegionLevel = "province" | "regency" | "district" | "village";
+export type { RegionHierarchy, RegionPath };
 
-export interface RegionNode {
-  code: string;
-  name: string;
-  level: RegionLevel;
-}
 
-export interface Province extends RegionNode {
-  level: "province";
-  regencies: Regency[];
-}
-
-export interface Regency extends RegionNode {
-  level: "regency";
-  parentProvinceCode: string;
-  districts: District[];
-}
-
-export interface District extends RegionNode {
-  level: "district";
-  parentProvinceCode: string;
-  parentRegencyCode: string;
-  villages: Village[];
-}
-
-export interface Village extends RegionNode {
-  level: "village";
-  parentProvinceCode: string;
-  parentRegencyCode: string;
-  parentDistrictCode: string;
-}
-
-export interface RegionHierarchy {
-  provinces: Province[];
-  provinceMap: Map<string, Province>;
-  regencyMap: Map<string, Regency>;
-  districtMap: Map<string, District>;
-  villageMap: Map<string, Village>;
-}
+// ─── Parsers ──────────────────────────────────────────────────────────────────
 
 const parseLine = (line: string): { code: string; name: string } | null => {
-  const trimmed = line.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  const firstCommaIndex = trimmed.indexOf(",");
-  if (firstCommaIndex === -1) {
-    return null;
-  }
-
-  const code = trimmed.slice(0, firstCommaIndex).trim();
-  const name = trimmed.slice(firstCommaIndex + 1).trim();
-
-  if (!code || !name) {
-    return null;
-  }
-
-  return { code, name };
+	const trimmed = line.trim();
+	if (!trimmed) return null;
+	const comma = trimmed.indexOf(',');
+	if (comma === -1) return null;
+	const code = trimmed.slice(0, comma).trim();
+	const name = trimmed.slice(comma + 1).trim();
+	if (!code || !name) return null;
+	return { code, name };
 };
 
-const ensureProvince = (
-  hierarchy: RegionHierarchy,
-  code: string,
-  name: string
-): Province => {
-  let province = hierarchy.provinceMap.get(code);
-  if (!province) {
-    province = {
-      code,
-      name,
-      level: "province",
-      regencies: [],
-    };
-    hierarchy.provinceMap.set(code, province);
-    hierarchy.provinces.push(province);
-  } else if (!province.name) {
-    province.name = name;
-  }
-  return province;
+// ─── Ensure helpers ───────────────────────────────────────────────────────────
+
+const ensureProvince = (h: RegionHierarchy, code: string, name: string): Province => {
+	let p = h.provinceMap.get(code);
+	if (!p) {
+		p = { code, name, level: 'province', regencies: [] };
+		h.provinceMap.set(code, p);
+		h.provinces.push(p);
+	} else if (!p.name && name) {
+		p.name = name;
+	}
+	return p;
 };
 
 const ensureRegency = (
-  hierarchy: RegionHierarchy,
-  code: string,
-  name: string,
-  provinceCode: string
+	h: RegionHierarchy,
+	code: string,
+	name: string,
+	provinceCode: string
 ): Regency => {
-  let regency = hierarchy.regencyMap.get(code);
-  if (!regency) {
-    regency = {
-      code,
-      name,
-      level: "regency",
-      parentProvinceCode: provinceCode,
-      districts: [],
-    };
-    hierarchy.regencyMap.set(code, regency);
-    const province = ensureProvince(hierarchy, provinceCode, "");
-    province.regencies.push(regency);
-  } else if (!regency.name) {
-    regency.name = name;
-  }
-  return regency;
+	let r = h.regencyMap.get(code);
+	if (!r) {
+		r = { code, name, level: 'regency', parentProvinceCode: provinceCode, districts: [] };
+		h.regencyMap.set(code, r);
+		ensureProvince(h, provinceCode, '').regencies.push(r);
+	} else if (!r.name && name) {
+		r.name = name;
+	}
+	return r;
 };
 
 const ensureDistrict = (
-  hierarchy: RegionHierarchy,
-  code: string,
-  name: string,
-  provinceCode: string,
-  regencyCode: string
+	h: RegionHierarchy,
+	code: string,
+	name: string,
+	provinceCode: string,
+	regencyCode: string
 ): District => {
-  let district = hierarchy.districtMap.get(code);
-  if (!district) {
-    district = {
-      code,
-      name,
-      level: "district",
-      parentProvinceCode: provinceCode,
-      parentRegencyCode: regencyCode,
-      villages: [],
-    };
-    hierarchy.districtMap.set(code, district);
-    const regency = ensureRegency(hierarchy, regencyCode, "", provinceCode);
-    regency.districts.push(district);
-  } else if (!district.name) {
-    district.name = name;
-  }
-  return district;
+	let d = h.districtMap.get(code);
+	if (!d) {
+		d = {
+			code,
+			name,
+			level: 'district',
+			parentProvinceCode: provinceCode,
+			parentRegencyCode: regencyCode,
+			villages: []
+		};
+		h.districtMap.set(code, d);
+		ensureRegency(h, regencyCode, '', provinceCode).districts.push(d);
+	} else if (!d.name && name) {
+		d.name = name;
+	}
+	return d;
 };
 
 const addVillage = (
-  hierarchy: RegionHierarchy,
-  code: string,
-  name: string,
-  provinceCode: string,
-  regencyCode: string,
-  districtCode: string
+	h: RegionHierarchy,
+	code: string,
+	name: string,
+	provinceCode: string,
+	regencyCode: string,
+	districtCode: string
 ) => {
-  if (hierarchy.villageMap.has(code)) {
-    return;
-  }
-
-  const village: Village = {
-    code,
-    name,
-    level: "village",
-    parentProvinceCode: provinceCode,
-    parentRegencyCode: regencyCode,
-    parentDistrictCode: districtCode,
-  };
-
-  hierarchy.villageMap.set(code, village);
-  const district = ensureDistrict(
-    hierarchy,
-    districtCode,
-    "",
-    provinceCode,
-    regencyCode
-  );
-  district.villages.push(village);
+	if (h.villageMap.has(code)) return;
+	const v: Village = {
+		code,
+		name,
+		level: 'village',
+		parentProvinceCode: provinceCode,
+		parentRegencyCode: regencyCode,
+		parentDistrictCode: districtCode
+	};
+	h.villageMap.set(code, v);
+	ensureDistrict(h, districtCode, '', provinceCode, regencyCode).villages.push(v);
 };
+
+// ─── Build hierarchy from CSV ─────────────────────────────────────────────────
 
 export const buildHierarchyFromCsv = (csv: string): RegionHierarchy => {
-  const hierarchy: RegionHierarchy = {
-    provinces: [],
-    provinceMap: new Map(),
-    regencyMap: new Map(),
-    districtMap: new Map(),
-    villageMap: new Map(),
-  };
+	const h: RegionHierarchy = {
+		provinces: [],
+		provinceMap: new Map(),
+		regencyMap: new Map(),
+		districtMap: new Map(),
+		villageMap: new Map()
+	};
 
-  const lines = csv.split(/\r?\n/);
-  for (const line of lines) {
-    const parsed = parseLine(line);
-    if (!parsed) {
-      continue;
-    }
+	for (const line of csv.split(/\r?\n/)) {
+		const parsed = parseLine(line);
+		if (!parsed) continue;
+		const { code, name } = parsed;
+		const parts = code.split('.');
 
-    const { code, name } = parsed;
-    const segments = code.split(".");
+		switch (parts.length) {
+			case 1:
+				ensureProvince(h, code, name);
+				break;
+			case 2:
+				ensureRegency(h, code, name, parts[0]);
+				break;
+			case 3:
+				ensureDistrict(h, code, name, parts[0], `${parts[0]}.${parts[1]}`);
+				break;
+			case 4:
+				addVillage(
+					h,
+					code,
+					name,
+					parts[0],
+					`${parts[0]}.${parts[1]}`,
+					`${parts[0]}.${parts[1]}.${parts[2]}`
+				);
+				break;
+		}
+	}
 
-    switch (segments.length) {
-      case 1: {
-        ensureProvince(hierarchy, code, name);
-        break;
-      }
-      case 2: {
-        const provinceCode = segments[0];
-        ensureRegency(hierarchy, code, name, provinceCode);
-        break;
-      }
-      case 3: {
-        const provinceCode = segments[0];
-        const regencyCode = `${segments[0]}.${segments[1]}`;
-        ensureDistrict(hierarchy, code, name, provinceCode, regencyCode);
-        break;
-      }
-      case 4: {
-        const provinceCode = segments[0];
-        const regencyCode = `${segments[0]}.${segments[1]}`;
-        const districtCode = `${segments[0]}.${segments[1]}.${segments[2]}`;
-        addVillage(
-          hierarchy,
-          code,
-          name,
-          provinceCode,
-          regencyCode,
-          districtCode
-        );
-        break;
-      }
-      default:
-        break;
-    }
-  }
+	const byName = <T extends { name: string }>(arr: T[]) =>
+		arr.sort((a, b) => a.name.localeCompare(b.name, 'id'));
 
-  // Sort for stable display order
-  const byName = <T extends RegionNode>(array: T[]) =>
-    array.sort((a, b) => a.name.localeCompare(b.name));
+	byName(h.provinces);
+	for (const prov of h.provinces) {
+		byName(prov.regencies);
+		for (const reg of prov.regencies) {
+			byName(reg.districts);
+			for (const dist of reg.districts) {
+				byName(dist.villages);
+			}
+		}
+	}
 
-  byName(hierarchy.provinces);
-  for (const province of hierarchy.provinces) {
-    byName(province.regencies);
-    for (const regency of province.regencies) {
-      byName(regency.districts);
-      for (const district of regency.districts) {
-        byName(district.villages);
-      }
-    }
-  }
-
-  return hierarchy;
+	return h;
 };
 
-export const getRegionPath = (
-  hierarchy: RegionHierarchy,
-  villageCode: string
-): {
-  province?: Province;
-  regency?: Regency;
-  district?: District;
-  village?: Village;
-} => {
-  const village = hierarchy.villageMap.get(villageCode);
-  if (!village) {
-    return {};
-  }
+// ─── Lookup helpers ───────────────────────────────────────────────────────────
 
-  const district = hierarchy.districtMap.get(village.parentDistrictCode);
-  const regency = hierarchy.regencyMap.get(village.parentRegencyCode);
-  const province = hierarchy.provinceMap.get(village.parentProvinceCode);
-
-  return { village, district, regency, province };
+export const getRegionPath = (h: RegionHierarchy, villageCode: string): RegionPath => {
+	const village = h.villageMap.get(villageCode);
+	if (!village) return {};
+	const district = h.districtMap.get(village.parentDistrictCode);
+	const regency = h.regencyMap.get(village.parentRegencyCode);
+	const province = h.provinceMap.get(village.parentProvinceCode);
+	return { village, district, regency, province };
 };
 
-export const getRegionDescription = (
-  hierarchy: RegionHierarchy,
-  villageCode: string
-): string => {
-  const { village, district, regency, province } = getRegionPath(
-    hierarchy,
-    villageCode
-  );
-  if (!village) {
-    return `Kode ${villageCode}`;
-  }
-
-  const parts = [village.name];
-  if (district) parts.push(district.name);
-  if (regency) parts.push(regency.name);
-  if (province) parts.push(province.name);
-
-  return parts.join(", ");
+export const getRegionDisplayName = (h: RegionHierarchy, villageCode: string): string => {
+	const { village, regency, province } = getRegionPath(h, villageCode);
+	if (!village) return villageCode;
+	const parts = [village.name];
+	if (regency) parts.push(regency.name);
+	if (province) parts.push(province.name);
+	return parts.join(', ');
 };
 
 export const splitRegionCode = (code: string) => {
-  const segments = code.split(".");
-  return {
-    provinceCode: segments[0] || "",
-    regencyCode: segments.length >= 2 ? `${segments[0]}.${segments[1]}` : "",
-    districtCode:
-      segments.length >= 3
-        ? `${segments[0]}.${segments[1]}.${segments[2]}`
-        : "",
-    villageCode: segments.length >= 4 ? code : "",
-  };
+	const s = code.split('.');
+	return {
+		provinceCode: s[0] || '',
+		regencyCode: s.length >= 2 ? `${s[0]}.${s[1]}` : '',
+		districtCode: s.length >= 3 ? `${s[0]}.${s[1]}.${s[2]}` : '',
+		villageCode: s.length >= 4 ? code : ''
+	};
+};
+
+// ─── Search ───────────────────────────────────────────────────────────────────
+
+export interface SearchResult {
+	villageCode: string;
+	villageName: string;
+	districtName: string;
+	regencyName: string;
+	provinceName: string;
+	displayName: string;
+}
+
+export const searchVillages = (
+	h: RegionHierarchy,
+	query: string,
+	limit = 20
+): SearchResult[] => {
+	if (!query.trim()) return [];
+	const q = query.toLowerCase().trim();
+	const results: SearchResult[] = [];
+
+	for (const [code, village] of h.villageMap) {
+		if (!village.name.toLowerCase().includes(q)) continue;
+		const district = h.districtMap.get(village.parentDistrictCode);
+		const regency = h.regencyMap.get(village.parentRegencyCode);
+		const province = h.provinceMap.get(village.parentProvinceCode);
+
+		results.push({
+			villageCode: code,
+			villageName: village.name,
+			districtName: district?.name ?? '',
+			regencyName: regency?.name ?? '',
+			provinceName: province?.name ?? '',
+			displayName: [village.name, regency?.name, province?.name].filter(Boolean).join(', ')
+		});
+
+		if (results.length >= limit) break;
+	}
+
+	return results;
 };
