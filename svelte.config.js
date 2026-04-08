@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-vercel';
 import { relative, sep } from 'node:path';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -14,8 +14,8 @@ const config = {
 		}
 	},
 	kit: {
-		// adapter-node is used for standalone Node.js server deployment (e.g., Docker/Dokploy).
-		// See https://svelte.dev/docs/kit/adapter-node for more information.
+		// adapter-vercel is used for deployment on Vercel.
+		// See https://svelte.dev/docs/kit/adapter-vercel for more information.
 		adapter: adapter()
 	}
 };
