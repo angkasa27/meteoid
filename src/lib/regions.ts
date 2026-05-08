@@ -1,4 +1,12 @@
-import type { Province, Regency, District, Village, RegionHierarchy, RegionPath } from './types.js';
+import type {
+	Province,
+	Regency,
+	District,
+	Village,
+	RegionHierarchy,
+	RegionPath,
+	SearchIndexEntry
+} from './types.js';
 
 export type { RegionHierarchy, RegionPath };
 
@@ -100,7 +108,8 @@ export const buildHierarchyFromCsv = (csv: string): RegionHierarchy => {
 		provinceMap: new Map(),
 		regencyMap: new Map(),
 		districtMap: new Map(),
-		villageMap: new Map()
+		villageMap: new Map(),
+		searchIndex: []
 	};
 
 	for (const line of csv.split(/\r?\n/)) {
@@ -146,6 +155,8 @@ export const buildHierarchyFromCsv = (csv: string): RegionHierarchy => {
 		}
 	}
 
+	h.searchIndex = buildSearchIndex(h);
+
 	return h;
 };
 
@@ -190,28 +201,91 @@ export interface SearchResult {
 	displayName: string;
 }
 
-export const searchVillages = (h: RegionHierarchy, query: string, limit = 20): SearchResult[] => {
-	if (!query.trim()) return [];
-	const q = query.toLowerCase().trim();
-	const results: SearchResult[] = [];
+const normalizeSearchText = (value: string): string =>
+	value
+		.toLowerCase()
+		.normalize('NFKD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^\p{L}\p{N}\s]+/gu, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+const tokenizeSearchText = (value: string): string[] =>
+	normalizeSearchText(value).split(' ').filter(Boolean);
+
+const buildSearchIndex = (h: RegionHierarchy): SearchIndexEntry[] => {
+	const entries: SearchIndexEntry[] = [];
 
 	for (const [code, village] of h.villageMap) {
-		if (!village.name.toLowerCase().includes(q)) continue;
 		const district = h.districtMap.get(village.parentDistrictCode);
 		const regency = h.regencyMap.get(village.parentRegencyCode);
 		const province = h.provinceMap.get(village.parentProvinceCode);
 
-		results.push({
+		const displayName = [village.name, regency?.name, province?.name].filter(Boolean).join(', ');
+		const districtName = district?.name ?? '';
+		const regencyName = regency?.name ?? '';
+		const provinceName = province?.name ?? '';
+
+		entries.push({
 			villageCode: code,
 			villageName: village.name,
-			districtName: district?.name ?? '',
-			regencyName: regency?.name ?? '',
-			provinceName: province?.name ?? '',
-			displayName: [village.name, regency?.name, province?.name].filter(Boolean).join(', ')
+			districtName,
+			regencyName,
+			provinceName,
+			displayName,
+			searchVillage: normalizeSearchText(village.name),
+			searchDistrict: normalizeSearchText(districtName),
+			searchRegency: normalizeSearchText(regencyName),
+			searchProvince: normalizeSearchText(provinceName),
+			searchCombined: normalizeSearchText(
+				[village.name, districtName, regencyName, provinceName].filter(Boolean).join(' ')
+			)
 		});
-
-		if (results.length >= limit) break;
 	}
 
-	return results;
+	return entries;
+};
+
+const getSearchRank = (entry: SearchIndexEntry, query: string, tokens: string[]): number | null => {
+	if (entry.searchVillage === query) return 0;
+	if (entry.searchVillage.startsWith(query)) return 1;
+	if (entry.searchRegency === query || entry.searchProvince === query) return 2;
+	if (tokens.length > 0 && tokens.every((token) => entry.searchCombined.includes(token))) return 3;
+	if (
+		entry.searchVillage.includes(query) ||
+		entry.searchDistrict.includes(query) ||
+		entry.searchRegency.includes(query) ||
+		entry.searchProvince.includes(query) ||
+		entry.searchCombined.includes(query)
+	) {
+		return 4;
+	}
+
+	return null;
+};
+
+export const searchVillages = (h: RegionHierarchy, query: string, limit = 20): SearchResult[] => {
+	const normalizedQuery = normalizeSearchText(query);
+	if (!normalizedQuery) return [];
+
+	const tokens = tokenizeSearchText(query);
+
+	return h.searchIndex
+		.map((entry) => ({
+			entry,
+			rank: getSearchRank(entry, normalizedQuery, tokens)
+		}))
+		.filter(
+			(candidate): candidate is { entry: SearchIndexEntry; rank: number } => candidate.rank !== null
+		)
+		.sort((a, b) => a.rank - b.rank || a.entry.displayName.localeCompare(b.entry.displayName, 'id'))
+		.slice(0, limit)
+		.map(({ entry }) => ({
+			villageCode: entry.villageCode,
+			villageName: entry.villageName,
+			districtName: entry.districtName,
+			regencyName: entry.regencyName,
+			provinceName: entry.provinceName,
+			displayName: entry.displayName
+		}));
 };

@@ -99,6 +99,7 @@ export interface RegionHierarchy {
 	regencyMap: Map<string, Regency>;
 	districtMap: Map<string, District>;
 	villageMap: Map<string, Village>;
+	searchIndex: SearchIndexEntry[];
 }
 
 export interface RegionPath {
@@ -106,4 +107,18 @@ export interface RegionPath {
 	regency?: Regency;
 	district?: District;
 	village?: Village;
+}
+
+export interface SearchIndexEntry {
+	villageCode: string;
+	villageName: string;
+	districtName: string;
+	regencyName: string;
+	provinceName: string;
+	displayName: string;
+	searchVillage: string;
+	searchDistrict: string;
+	searchRegency: string;
+	searchProvince: string;
+	searchCombined: string;
 }

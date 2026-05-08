@@ -376,7 +376,7 @@
 					bind:this={inputEl}
 					bind:value={query}
 					type="search"
-					placeholder="Nama kelurahan atau desa…"
+					placeholder="Kelurahan, kota/kabupaten, atau provinsi…"
 					oninput={handleInput}
 					onkeydown={handleKeydown}
 					autocomplete="off"
@@ -588,7 +588,8 @@
 				<div class="rounded-2xl border border-[var(--glass-line-soft)] px-4 py-4">
 					<p class="font-mono text-[10px] tracking-[0.2em] text-ink-mute uppercase">Tip</p>
 					<p class="mt-2 text-sm leading-relaxed text-ink-soft">
-						91.000+ wilayah Indonesia. Ketik nama kelurahan untuk mulai. Gunakan
+						91.000+ wilayah Indonesia. Cari dengan nama kelurahan, kota/kabupaten, atau provinsi.
+						Gunakan
 						<span class="font-mono text-xs text-ink">↑↓</span> untuk navigasi.
 					</p>
 				</div>
