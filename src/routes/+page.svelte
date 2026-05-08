@@ -67,26 +67,14 @@
 
 <!-- ── Top bar: minimal, floats over the cinematic background ────────────── -->
 <header class="relative z-30">
-	<div
-		class="mx-auto flex max-w-6xl items-center gap-3 px-5 pt-5 sm:px-8 sm:pt-7"
-	>
+	<div class="mx-auto flex max-w-6xl items-center gap-3 px-5 pt-5 sm:px-8 sm:pt-7">
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a
 			href="/"
 			class="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80"
 			aria-label="Meteoid home"
 		>
-			<svg
-				viewBox="0 0 24 24"
-				class="h-5 w-5 text-ink"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.4"
-				aria-hidden="true"
-			>
-				<circle cx="12" cy="12" r="9" />
-				<path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
-			</svg>
+			<img src="/logo.svg" alt="Meteoid" class="h-5 w-5" />
 			<span class="font-display text-xl tracking-tight text-ink">Meteoid</span>
 		</a>
 
@@ -151,7 +139,7 @@
 	{#if data.weatherError}
 		<div class="mt-20 flex flex-col items-center text-center">
 			<p class="font-display text-7xl leading-none text-ink/40">—</p>
-			<h2 class="mt-6 font-display text-3xl text-ink">Tidak ada langit untuk dilihat.</h2>
+			<h2 class="font-display mt-6 text-3xl text-ink">Tidak ada langit untuk dilihat.</h2>
 			<p class="mt-2 max-w-sm text-sm text-ink-mute">{data.weatherError}</p>
 			<button
 				onclick={refresh}

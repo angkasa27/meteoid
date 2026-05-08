@@ -14,19 +14,10 @@
 			<!-- Mark + tagline -->
 			<div class="md:col-span-5">
 				<div class="flex items-center gap-2.5">
-					<svg
-						viewBox="0 0 24 24"
-						class="h-5 w-5 text-ink"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.4"
-					>
-						<circle cx="12" cy="12" r="9" />
-						<path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
-					</svg>
+					<img src="/logo.svg" alt="Meteoid" class="h-5 w-5" />
 					<span class="font-display text-2xl tracking-tight text-ink">Meteoid</span>
 				</div>
-				<p class="mt-3 max-w-md font-display text-2xl leading-snug text-ink-soft italic">
+				<p class="font-display mt-3 max-w-md text-2xl leading-snug text-ink-soft italic">
 					Langit Indonesia, dirangkai dalam satu layar.
 				</p>
 				<p class="mt-3 max-w-md text-sm text-ink-mute">
@@ -45,7 +36,9 @@
 							rel="noopener noreferrer"
 							class="group inline-flex items-center gap-2 text-ink-soft transition-colors hover:text-ink"
 						>
-							<ExternalLink class="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+							<ExternalLink
+								class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+							/>
 							API BMKG
 						</a>
 					</li>
@@ -56,7 +49,9 @@
 							rel="noopener noreferrer"
 							class="group inline-flex items-center gap-2 text-ink-soft transition-colors hover:text-ink"
 						>
-							<ExternalLink class="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+							<ExternalLink
+								class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+							/>
 							Website BMKG
 						</a>
 					</li>
@@ -101,7 +96,7 @@
 							Source code
 						</a>
 					</li>
-					<li class="text-ink-mute text-xs">
+					<li class="text-xs text-ink-mute">
 						Ikon cuaca:
 						<a
 							href="https://github.com/basmilius/weather-icons"
@@ -117,7 +112,9 @@
 			</div>
 		</div>
 
-		<div class="mt-10 flex flex-col gap-4 border-t border-[var(--glass-line-soft)] pt-6 text-xs text-ink-mute sm:flex-row sm:items-center sm:justify-between">
+		<div
+			class="mt-10 flex flex-col gap-4 border-t border-[var(--glass-line-soft)] pt-6 text-xs text-ink-mute sm:flex-row sm:items-center sm:justify-between"
+		>
 			<p>© {currentYear} Meteoid. Tidak untuk penggunaan komersial.</p>
 			<p class="font-mono text-[10px] tracking-[0.2em] uppercase">Made for Indonesia</p>
 		</div>
