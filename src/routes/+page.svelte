@@ -11,7 +11,6 @@
 	import WeatherAlerts from '$lib/components/weather/weather-alerts.svelte';
 	import LocationDrawer from '$lib/components/location/location-drawer.svelte';
 	import Skeleton from '$lib/components/ui/skeleton.svelte';
-	import GlassCard from '$lib/components/ui/glass-card.svelte';
 	import Footer from '$lib/components/layout/footer.svelte';
 
 	import { onMount } from 'svelte';
