@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import { regionsStore } from '$lib/stores/regions.svelte.js';
+	import { getSkyKey } from '$lib/sky.js';
 
 	import CurrentWeather from '$lib/components/weather/current-weather.svelte';
 	import HourlyForecast from '$lib/components/weather/hourly-forecast.svelte';
@@ -21,26 +21,30 @@
 	let drawerOpen = $state(false);
 	let isNavigating = $state(false);
 
-	// Hydrate recent store from localStorage on mount
 	onMount(() => regionsStore.load());
 
-	// Derive location display name from recent store or fall back to a readable label
 	const locationLabel = $derived(() => {
 		const recent = regionsStore.recentLocations.find((r) => r.code === data.selectedCode);
 		if (recent) return recent.name;
-		// If no recent, show a clean placeholder — user hasn't named this location yet
 		return 'Pilih Lokasi';
 	});
 
 	const locationSubLabel = $derived(() => {
 		const recent = regionsStore.recentLocations.find((r) => r.code === data.selectedCode);
 		if (recent) return recent.subName;
-		// Show the raw code as the sub-label so it's still accessible
 		return data.selectedCode;
 	});
 
 	const currentWeather = $derived(data.hourlyData[0] ?? null);
 	const hasData = $derived(data.hourlyData.length > 0);
+
+	// Drive the cinematic background: set data-sky on <html> from current conditions.
+	$effect(() => {
+		if (typeof document === 'undefined') return;
+		const w = currentWeather;
+		const key = w ? getSkyKey(w.category, w.datetime) : 'day-clear';
+		document.documentElement.dataset.sky = key;
+	});
 
 	const handleLocationSelect = async (code: string) => {
 		isNavigating = true;
@@ -54,150 +58,147 @@
 </script>
 
 <svelte:head>
-	<title>Meteoid — Prakiraan Cuaca {locationLabel()} | Indonesia</title>
+	<title>Meteoid — {locationLabel()}</title>
 	<meta
 		name="description"
-		content="Prakiraan cuaca akurat untuk {locationLabel()} dari BMKG Indonesia. Pantau kondisi cuaca terkini, suhu, and peringatan cuaca."
+		content="Prakiraan cuaca akurat untuk {locationLabel()} dari BMKG Indonesia. Pantau kondisi cuaca terkini, suhu, dan peringatan cuaca."
 	/>
 </svelte:head>
 
-<!-- ── Header ──────────────────────────────────────────────────────────────── -->
-<header class="sticky top-0 z-30 border-b border-white/5 bg-bg-base/80 backdrop-blur-xl">
-	<div class="mx-auto flex max-w-4xl items-center gap-2 px-4 py-3 sm:px-6">
+<!-- ── Top bar: minimal, floats over the cinematic background ────────────── -->
+<header class="relative z-30">
+	<div
+		class="mx-auto flex max-w-6xl items-center gap-3 px-5 pt-5 sm:px-8 sm:pt-7"
+	>
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		<a href="/" class="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80">
-			<img src="/logo.svg" alt="Meteoid Logo" class="h-6 w-6" />
-			<span class="hidden text-base font-bold tracking-tight text-text-primary sm:block"
-				>Meteoid</span
+		<a
+			href="/"
+			class="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80"
+			aria-label="Meteoid home"
+		>
+			<svg
+				viewBox="0 0 24 24"
+				class="h-5 w-5 text-ink"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+				aria-hidden="true"
 			>
+				<circle cx="12" cy="12" r="9" />
+				<path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
+			</svg>
+			<span class="font-display text-xl tracking-tight text-ink">Meteoid</span>
 		</a>
 
-		<!-- Location display (clickable to open drawer) -->
-		<button
-			onclick={() => (drawerOpen = true)}
-			class="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/8 bg-white/4 px-3 py-2
-				   text-left transition-all hover:border-accent/30 hover:bg-accent/6 focus-visible:outline-accent"
-			aria-label="Pilih lokasi: {locationLabel()}"
-		>
-			<svg
-				class="h-3.5 w-3.5 shrink-0 text-accent"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
+		<div class="ml-auto flex items-center gap-2">
+			<button
+				onclick={() => (drawerOpen = true)}
+				class="glass-soft flex items-center gap-2 rounded-full px-3.5 py-2 text-xs text-ink-soft transition-all hover:bg-[var(--glass)] hover:text-ink sm:text-sm"
+				aria-label="Pilih lokasi: {locationLabel()}"
 			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
+				<svg
+					class="h-3.5 w-3.5 text-accent"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
 					stroke-width="2"
-					d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-				/>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-				/>
-			</svg>
-			<div class="min-w-0 flex-1">
-				<div class="truncate text-sm leading-tight font-medium text-text-primary">
-					{locationLabel()}
-				</div>
-				{#if locationSubLabel()}
-					<div class="truncate text-xs leading-tight text-text-muted">{locationSubLabel()}</div>
-				{/if}
-			</div>
-			<svg
-				class="h-3.5 w-3.5 shrink-0 text-text-muted"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-			</svg>
-		</button>
+					aria-hidden="true"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M12 21s-7-7.58-7-12a7 7 0 1114 0c0 4.42-7 12-7 12z"
+					/>
+					<circle cx="12" cy="9" r="2.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<span class="max-w-[10rem] truncate sm:max-w-[18rem]">{locationLabel()}</span>
+				<svg class="h-3 w-3 text-ink-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M19 9l-7 7-7-7"
+					/>
+				</svg>
+			</button>
 
-		<!-- Refresh -->
-		<button
-			onclick={refresh}
-			class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/8 bg-white/5
-				   text-text-muted transition-all hover:bg-white/8 hover:text-text-primary focus-visible:outline-accent"
-			title="Segarkan"
-			aria-label="Segarkan data cuaca"
-		>
-			<svg
-				class="h-4 w-4 {isNavigating ? 'animate-spin' : ''}"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
+			<button
+				onclick={refresh}
+				class="glass-soft flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-all hover:bg-[var(--glass)] hover:text-ink"
+				title="Segarkan"
+				aria-label="Segarkan data cuaca"
 			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
+				<svg
+					class="h-4 w-4 {isNavigating ? 'animate-spin' : ''}"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
 					stroke-width="2"
-					d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-				/>
-			</svg>
-		</button>
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+					/>
+				</svg>
+			</button>
+		</div>
 	</div>
 </header>
 
-<!-- ── Main content ─────────────────────────────────────────────────────────── -->
-<main class="mx-auto max-w-4xl px-4 py-5 sm:px-6">
+<!-- ── Main ─────────────────────────────────────────────────────────────── -->
+<main class="relative z-10 mx-auto max-w-6xl px-5 pb-16 sm:px-8">
 	{#if data.weatherError}
-		<GlassCard class="py-12 text-center">
-			<p class="mb-3 text-4xl" aria-hidden="true">⚠️</p>
-			<h2 class="mb-2 text-lg font-semibold text-text-primary">Gagal Memuat Data</h2>
-			<p class="mb-5 text-sm text-text-muted">{data.weatherError}</p>
+		<div class="mt-20 flex flex-col items-center text-center">
+			<p class="font-display text-7xl leading-none text-ink/40">—</p>
+			<h2 class="mt-6 font-display text-3xl text-ink">Tidak ada langit untuk dilihat.</h2>
+			<p class="mt-2 max-w-sm text-sm text-ink-mute">{data.weatherError}</p>
 			<button
 				onclick={refresh}
-				class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-text-secondary
-					   transition-all hover:border-accent/30 hover:bg-accent/10 hover:text-accent"
+				class="glass mt-6 rounded-full px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-[var(--glass-strong)]"
 			>
-				Coba Lagi
+				Coba lagi
 			</button>
-		</GlassCard>
+		</div>
 	{:else if isNavigating || !hasData}
-		<div class="animate-fade-up flex flex-col gap-4">
-			<div class="glass rounded-2xl p-5">
-				<Skeleton height="h-5" width="w-32" class="mb-4" />
-				<Skeleton height="h-20" width="w-48" class="mb-2" />
-				<Skeleton height="h-4" width="w-40" class="mb-5" />
-				<div class="grid grid-cols-3 gap-3">
-					<Skeleton height="h-10" />
-					<Skeleton height="h-10" />
-					<Skeleton height="h-10" />
-				</div>
+		<div class="mt-20 flex flex-col gap-10">
+			<div>
+				<Skeleton height="h-3" width="w-40" class="mb-4" />
+				<Skeleton height="h-12" width="w-72" class="mb-3" />
+				<Skeleton height="h-[10rem]" width="w-72" />
 			</div>
-			<div class="glass rounded-2xl p-4">
-				<Skeleton height="h-4" width="w-36" class="mb-3" />
-				<div class="flex gap-2 overflow-hidden">
-					{#each Array(6) as _, i (i)}
-						<Skeleton height="h-20" width="w-16" class="shrink-0" />
-					{/each}
-				</div>
+			<Skeleton height="h-32" />
+			<div class="grid gap-4 md:grid-cols-2">
+				<Skeleton height="h-64" />
+				<Skeleton height="h-64" />
 			</div>
-			<Skeleton height="h-64" />
 		</div>
 	{:else}
-		<div class="animate-fade-up flex flex-col gap-4">
+		<CurrentWeather
+			current={currentWeather}
+			locationName={locationLabel()}
+			locationSubName={locationSubLabel()}
+		/>
+
+		<div class="mt-2 flex flex-col gap-6">
 			{#if data.alerts.length > 0}
 				<WeatherAlerts alerts={data.alerts} />
-			{/if}
-
-			{#if currentWeather}
-				<CurrentWeather current={currentWeather} locationName={locationLabel()} />
 			{/if}
 
 			{#if data.hourlyData.length > 1}
 				<HourlyForecast hourly={data.hourlyData} />
 			{/if}
 
-			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-5">
 				{#if data.dailyData.length > 0}
-					<DailyForecast daily={data.dailyData} />
+					<div class="md:col-span-3">
+						<DailyForecast daily={data.dailyData} />
+					</div>
 				{/if}
 				{#if data.hourlyData.length > 0}
-					<WeatherDetails hourly={data.hourlyData} />
+					<div class="md:col-span-2">
+						<WeatherDetails hourly={data.hourlyData} />
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -206,7 +207,6 @@
 
 <Footer />
 
-<!-- Location drawer -->
 <LocationDrawer
 	currentCode={data.selectedCode}
 	onSelect={handleLocationSelect}

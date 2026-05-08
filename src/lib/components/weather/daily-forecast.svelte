@@ -10,10 +10,15 @@
 
 	let { daily }: Props = $props();
 
-	// Show max 7 days
 	const days = $derived(daily.slice(0, 7));
-
 	let expandedDate = $state<string | null>(null);
+
+	// Global min/max so each row's range bar reads on the same scale
+	const range = $derived.by(() => {
+		const mins = days.map((d) => d.minTemp);
+		const maxs = days.map((d) => d.maxTemp);
+		return { lo: Math.min(...mins), hi: Math.max(...maxs) };
+	});
 
 	const toggle = (dateStr: string) => {
 		expandedDate = expandedDate === dateStr ? null : dateStr;
@@ -21,77 +26,77 @@
 </script>
 
 <GlassCard padding="none">
-	<div class="px-4 pt-4 sm:px-5 sm:pt-5">
-		<h2 class="text-sm font-semibold text-text-secondary">Prakiraan 7 Hari</h2>
+	<div class="flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6">
+		<h2 class="font-display text-2xl text-ink">Tujuh hari</h2>
+		<span class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">7d</span>
 	</div>
 
-	<div class="mt-2 divide-y divide-white/5">
-		{#each days as day (day.dateStr)}
+	<ul class="px-2 pt-2 pb-3 sm:px-3 sm:pb-4">
+		{#each days as day, i (day.dateStr)}
 			{@const isToday = day.dateStr === new Date().toISOString().slice(0, 10)}
 			{@const isExpanded = expandedDate === day.dateStr}
+			{@const span = Math.max(1, range.hi - range.lo)}
+			{@const left = ((day.minTemp - range.lo) / span) * 100}
+			{@const width = ((day.maxTemp - day.minTemp) / span) * 100}
 
-			<button
-				class="w-full px-4 py-3 text-left transition-colors hover:bg-white/4 sm:px-5"
-				onclick={() => toggle(day.dateStr)}
-				aria-expanded={isExpanded}
-			>
-				<div class="flex items-center gap-3">
-					<WeatherIcon category={day.category} size={22} />
+			<li class="border-b border-[var(--glass-line-soft)] last:border-b-0">
+				<button
+					class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-3 py-3.5 text-left transition-colors hover:bg-[var(--glass)] sm:px-4"
+					onclick={() => toggle(day.dateStr)}
+					aria-expanded={isExpanded}
+				>
+					<WeatherIcon
+						category={day.category}
+						date={new Date(`${day.dateStr}T12:00:00`)}
+						size={36}
+					/>
 
-					<div class="min-w-0 flex-1">
-						<span class="text-sm font-medium {isToday ? 'text-accent' : 'text-text-primary'}">
+					<div class="min-w-0">
+						<p
+							class="font-display text-lg leading-tight {isToday ? 'text-accent' : 'text-ink'}"
+						>
 							{isToday ? 'Hari ini' : day.label}
-						</span>
-						<span class="ml-2 text-xs text-text-muted">{day.dominantWeather}</span>
+						</p>
+						<p class="truncate text-xs text-ink-mute">{day.dominantWeather}</p>
 					</div>
 
-					<div class="flex shrink-0 items-center gap-3 text-sm">
-						<span class="text-text-muted">{day.minTemp}°</span>
-						<div class="h-1.5 w-12 overflow-hidden rounded-full bg-white/10">
+					<div class="flex items-center gap-3 font-mono text-sm">
+						<span class="w-8 text-right text-ink-mute">{day.minTemp}°</span>
+						<div
+							class="relative h-1 w-20 overflow-hidden rounded-full bg-[var(--glass-line-soft)] sm:w-28"
+						>
 							<div
-								class="h-full rounded-full bg-gradient-to-r from-blue-400 to-orange-400"
-								style="width: {Math.min(100, ((day.maxTemp - day.minTemp) / 20) * 100)}%"
+								class="absolute top-0 h-full rounded-full"
+								style="left: {left}%; width: {width}%;
+								background: linear-gradient(90deg, oklch(0.7 0.15 230), var(--accent));"
 							></div>
 						</div>
-						<span class="font-medium text-text-primary">{day.maxTemp}°</span>
-						<svg
-							class="h-4 w-4 text-text-muted transition-transform duration-200 {isExpanded
-								? 'rotate-180'
-								: ''}"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19 9l-7 7-7-7"
-							/>
-						</svg>
+						<span class="w-8 text-ink">{day.maxTemp}°</span>
 					</div>
-				</div>
-			</button>
+				</button>
 
-			{#if isExpanded}
-				<div transition:slide={{ duration: 250 }} class="bg-white/2 px-4 pb-3 sm:px-5">
-					<div class="no-scrollbar flex gap-2 overflow-x-auto pt-2">
-						{#each day.hourly as h (h.timeStr)}
-							<div
-								class="flex min-w-[56px] flex-col items-center gap-1.5 rounded-lg bg-white/4 p-2"
-							>
-								<span class="text-xs text-text-muted">{h.timeStr}</span>
-								<WeatherIcon category={h.category} size={18} />
-								<span class="text-xs font-semibold text-text-primary">{h.temperature}°</span>
-							</div>
-						{/each}
+				{#if isExpanded}
+					<div transition:slide={{ duration: 220 }} class="px-3 pb-3 sm:px-4">
+						<div class="no-scrollbar flex gap-1.5 overflow-x-auto pt-1">
+							{#each day.hourly as h (h.timeStr)}
+								<div
+									class="flex min-w-[58px] flex-col items-center gap-1 rounded-xl bg-[var(--glass)] px-2 py-2"
+								>
+									<span class="font-mono text-[10px] text-ink-mute">{h.timeStr}</span>
+									<WeatherIcon category={h.category} date={h.datetime} size={24} />
+									<span class="font-display text-sm text-ink leading-none">
+										{h.temperature}°
+									</span>
+								</div>
+							{/each}
+						</div>
+						<p class="mt-3 text-xs text-ink-mute">
+							Rata-rata kelembapan
+							<span class="font-mono text-ink-soft">{day.avgHumidity}%</span>
+						</p>
 					</div>
-					<div class="mt-2 grid grid-cols-3 gap-2 text-xs text-text-muted">
-						<span>💧 {day.avgHumidity}% kelembapan</span>
-					</div>
-				</div>
-			{/if}
+				{/if}
+			</li>
 		{/each}
-	</div>
+	</ul>
 </GlassCard>

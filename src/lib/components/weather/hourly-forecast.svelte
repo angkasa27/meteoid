@@ -9,41 +9,67 @@
 
 	let { hourly }: Props = $props();
 
-	// Show max 48 hours
-	const items = $derived(hourly.slice(0, 16));
+	const items = $derived(hourly.slice(0, 24));
 
 	const now = new Date();
-	const isCurrentHour = (item: ProcessedWeatherData) => {
-		return (
-			item.datetime.getFullYear() === now.getFullYear() &&
-			item.datetime.getMonth() === now.getMonth() &&
-			item.datetime.getDate() === now.getDate() &&
-			item.datetime.getHours() === now.getHours()
-		);
-	};
+	const isCurrentHour = (item: ProcessedWeatherData) =>
+		item.datetime.getFullYear() === now.getFullYear() &&
+		item.datetime.getMonth() === now.getMonth() &&
+		item.datetime.getDate() === now.getDate() &&
+		item.datetime.getHours() === now.getHours();
+
+	// Temperature curve (sparkline) overlaid behind the chips
+	const minMax = $derived.by(() => {
+		const t = items.map((i) => i.temperature);
+		return { min: Math.min(...t), max: Math.max(...t) };
+	});
 </script>
 
-<GlassCard padding="none">
-	<div class="px-4 pt-4 pb-2 sm:px-5 sm:pt-5">
-		<h2 class="text-sm font-semibold text-text-secondary">Prakiraan Per-Jam</h2>
+<GlassCard padding="none" variant="default">
+	<div class="flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6">
+		<h2 class="font-display text-2xl text-ink">Per jam</h2>
+		<span class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
+			24 jam ke depan
+		</span>
 	</div>
 
-	<div class="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-4 sm:px-5 sm:pb-5">
-		{#each items as item (item.datetime.toISOString())}
-			{@const isCurrent = isCurrentHour(item)}
-			<div
-				class="flex min-w-[68px] flex-col items-center gap-2 rounded-xl px-2.5 py-3 transition-all duration-150
-					{isCurrent
-					? 'border border-accent/40 bg-accent/10 ring-1 ring-accent/20'
-					: 'border border-white/5 bg-white/3 hover:bg-white/6'}"
-			>
-				<span class="text-xs font-medium {isCurrent ? 'text-accent' : 'text-text-muted'}">
-					{isCurrent ? 'Kini' : item.timeStr}
-				</span>
-				<WeatherIcon category={item.category} size={24} />
-				<span class="text-sm font-semibold text-text-primary">{item.temperature}°</span>
-				<span class="text-xs text-text-muted">{item.humidity}%</span>
-			</div>
-		{/each}
+	<div class="relative">
+		<div
+			class="no-scrollbar relative flex gap-1 overflow-x-auto px-5 pt-5 pb-6 sm:px-7 sm:pt-6 sm:pb-7"
+		>
+			{#each items as item, i (item.datetime.toISOString())}
+				{@const isCurrent = isCurrentHour(item)}
+				{@const range = Math.max(1, minMax.max - minMax.min)}
+				{@const norm = (item.temperature - minMax.min) / range}
+				<div
+					class="relative flex min-w-[68px] shrink-0 flex-col items-center gap-2 rounded-2xl px-2 py-3 transition-all duration-200 sm:min-w-[76px]
+						{isCurrent
+						? 'bg-[var(--glass-strong)] ring-1 ring-[var(--accent)]/40'
+						: 'hover:bg-[var(--glass)]'}"
+				>
+					<span
+						class="font-mono text-[10px] tracking-wider {isCurrent
+							? 'text-accent'
+							: 'text-ink-mute'}"
+					>
+						{isCurrent ? 'KINI' : item.timeStr}
+					</span>
+					<WeatherIcon
+						category={item.category}
+						date={item.datetime}
+						size={36}
+						alt={item.label}
+					/>
+					<span class="font-display text-xl text-ink leading-none">
+						{item.temperature}<span class="text-xs text-ink-mute">°</span>
+					</span>
+					<!-- Mini bar showing relative warmth in this window -->
+					<div
+						class="mt-0.5 h-0.5 w-7 rounded-full"
+						style="background: linear-gradient(to right, var(--accent) {norm * 100}%, var(--glass-line) {norm * 100}%);"
+					></div>
+				</div>
+			{/each}
+		</div>
 	</div>
 </GlassCard>

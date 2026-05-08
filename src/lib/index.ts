@@ -21,4 +21,6 @@ export {
 	getWeatherCategory
 } from './weather.js';
 export { cn } from './utils.js';
+export { getTimeOfDay, getSkyKey, getIconFile, iconUrl } from './sky.js';
+export type { TimeOfDay, SkyCondition, SkyKey } from './sky.js';
 export type * from './types.js';
