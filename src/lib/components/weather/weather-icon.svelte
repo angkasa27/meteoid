@@ -11,13 +11,7 @@
 		class?: string;
 	}
 
-	let {
-		category,
-		date = new Date(),
-		size = 48,
-		alt = category,
-		class: cls = ''
-	}: Props = $props();
+	let { category, date = new Date(), size = 48, alt = category, class: cls = '' }: Props = $props();
 
 	const src = $derived(iconUrl(category, date, base));
 </script>

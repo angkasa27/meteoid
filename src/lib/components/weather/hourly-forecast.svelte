@@ -10,8 +10,17 @@
 	let { hourly }: Props = $props();
 
 	const items = $derived(hourly.slice(0, 24));
+	let now = $state(new Date());
 
-	const now = new Date();
+	$effect(() => {
+		now = new Date();
+		const interval = setInterval(() => {
+			now = new Date();
+		}, 60_000);
+
+		return () => clearInterval(interval);
+	});
+
 	const isCurrentHour = (item: ProcessedWeatherData) =>
 		item.datetime.getFullYear() === now.getFullYear() &&
 		item.datetime.getMonth() === now.getMonth() &&
@@ -37,15 +46,13 @@
 		<div
 			class="no-scrollbar relative flex gap-1 overflow-x-auto px-5 pt-5 pb-6 sm:px-7 sm:pt-6 sm:pb-7"
 		>
-			{#each items as item, i (item.datetime.toISOString())}
+			{#each items as item (item.datetime.toISOString())}
 				{@const isCurrent = isCurrentHour(item)}
 				{@const range = Math.max(1, minMax.max - minMax.min)}
 				{@const norm = (item.temperature - minMax.min) / range}
 				<div
 					class="relative flex min-w-[68px] shrink-0 flex-col items-center gap-2 rounded-2xl px-2 py-3 transition-all duration-200 sm:min-w-[76px]
-						{isCurrent
-						? 'bg-[var(--glass-strong)] ring-1 ring-[var(--accent)]/40'
-						: 'hover:bg-[var(--glass)]'}"
+						{isCurrent ? 'bg-[var(--glass-strong)] ring-1 ring-[var(--accent)]/40' : 'hover:bg-[var(--glass)]'}"
 				>
 					<span
 						class="font-mono text-[10px] tracking-wider {isCurrent
@@ -54,19 +61,15 @@
 					>
 						{isCurrent ? 'KINI' : item.timeStr}
 					</span>
-					<WeatherIcon
-						category={item.category}
-						date={item.datetime}
-						size={36}
-						alt={item.label}
-					/>
-					<span class="font-display text-xl text-ink leading-none">
+					<WeatherIcon category={item.category} date={item.datetime} size={36} alt={item.label} />
+					<span class="font-display text-xl leading-none text-ink">
 						{item.temperature}<span class="text-xs text-ink-mute">°</span>
 					</span>
 					<!-- Mini bar showing relative warmth in this window -->
 					<div
 						class="mt-0.5 h-0.5 w-7 rounded-full"
-						style="background: linear-gradient(to right, var(--accent) {norm * 100}%, var(--glass-line) {norm * 100}%);"
+						style="background: linear-gradient(to right, var(--accent) {norm *
+							100}%, var(--glass-line) {norm * 100}%);"
 					></div>
 				</div>
 			{/each}

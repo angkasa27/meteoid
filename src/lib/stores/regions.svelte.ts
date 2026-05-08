@@ -1,3 +1,4 @@
+import { base } from '$app/paths';
 import { buildHierarchyFromCsv, searchVillages } from '$lib/regions.js';
 import type { RegionHierarchy, SearchResult } from '$lib/regions.js';
 
@@ -17,6 +18,7 @@ export interface RecentLocation {
 
 const RECENT_KEY = 'meteoid:recent-locations';
 const RECENT_MAX = 6;
+const REGIONS_CSV_URL = `${base}/regions.csv`;
 
 const readRecent = (): RecentLocation[] => {
 	if (typeof localStorage === 'undefined') return [];
@@ -52,14 +54,15 @@ export const regionsStore = {
 
 	/** Call once to kick off loading — safe to call multiple times */
 	async load(): Promise<void> {
-		if (hierarchy || loading) return loadPromise ?? Promise.resolve();
+		if (hierarchy) return;
+		if (loadPromise) return loadPromise;
 
 		loading = true;
 		error = null;
 
 		loadPromise = (async () => {
 			try {
-				const res = await fetch('/api/regions');
+				const res = await fetch(REGIONS_CSV_URL);
 				if (!res.ok) throw new Error(`HTTP ${res.status}`);
 				const csv = await res.text();
 				hierarchy = buildHierarchyFromCsv(csv);
@@ -70,6 +73,7 @@ export const regionsStore = {
 				console.error('[regionsStore] load error:', e);
 			} finally {
 				loading = false;
+				loadPromise = null;
 			}
 		})();
 
@@ -106,3 +110,11 @@ export const regionsStore = {
 };
 
 export type { SearchResult };
+
+export const resetRegionsStoreForTests = () => {
+	hierarchy = null;
+	loading = false;
+	error = null;
+	loadPromise = null;
+	recentLocations = [];
+};

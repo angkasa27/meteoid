@@ -11,13 +11,12 @@
 	}
 
 	interface Props {
-		currentCode: string;
 		onSelect: (code: string, name: string, subName: string) => void;
 		open: boolean;
 		onClose: () => void;
 	}
 
-	let { currentCode, onSelect, open, onClose }: Props = $props();
+	let { onSelect, open, onClose }: Props = $props();
 
 	let query = $state('');
 	let searchResults = $state<SearchResult[]>([]);
@@ -33,8 +32,9 @@
 
 	$effect(() => {
 		if (open) {
-			regionsStore.load();
-			setTimeout(() => inputEl?.focus(), 300);
+			void regionsStore.load();
+			const focusTimer = setTimeout(() => inputEl?.focus(), 300);
+			return () => clearTimeout(focusTimer);
 		} else {
 			query = '';
 			searchResults = [];
@@ -60,6 +60,13 @@
 			isSearching = false;
 			return;
 		}
+
+		if (regionsStore.loading || !regionsStore.hierarchy) {
+			searchResults = [];
+			isSearching = false;
+			return;
+		}
+
 		isSearching = true;
 		searchResults = regionsStore.search(q, 25);
 		isSearching = false;
@@ -189,13 +196,30 @@
 		}
 	};
 
-	const highlight = (text: string, q: string): string => {
-		if (!q.trim()) return text;
-		const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		return text.replace(
-			new RegExp(`(${escaped})`, 'gi'),
-			'<mark style="background: color-mix(in oklch, var(--accent) 30%, transparent); color: var(--ink); border-radius: 2px; padding: 0 2px;">$1</mark>'
-		);
+	const highlight = (text: string, q: string): Array<{ text: string; match: boolean }> => {
+		const trimmed = q.trim();
+		if (!trimmed) return [{ text, match: false }];
+
+		const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const pattern = new RegExp(escaped, 'gi');
+		const parts: Array<{ text: string; match: boolean }> = [];
+		let lastIndex = 0;
+
+		for (const match of text.matchAll(pattern)) {
+			const index = match.index ?? 0;
+			if (index > lastIndex) {
+				parts.push({ text: text.slice(lastIndex, index), match: false });
+			}
+
+			parts.push({ text: match[0], match: true });
+			lastIndex = index + match[0].length;
+		}
+
+		if (lastIndex < text.length) {
+			parts.push({ text: text.slice(lastIndex), match: false });
+		}
+
+		return parts.length ? parts : [{ text, match: false }];
 	};
 
 	const showSearch = $derived(query.trim().length >= 2);
@@ -226,7 +250,9 @@
 		</div>
 
 		<!-- Header -->
-		<div class="flex shrink-0 items-center justify-between border-b border-[var(--glass-line-soft)] px-6 py-4">
+		<div
+			class="flex shrink-0 items-center justify-between border-b border-[var(--glass-line-soft)] px-6 py-4"
+		>
 			<div>
 				<p class="font-mono text-[10px] tracking-[0.22em] text-ink-mute uppercase">Cari</p>
 				<h2 class="font-display text-2xl text-ink">Pilih lokasi</h2>
@@ -255,23 +281,54 @@
 			>
 				{#if geoState === 'loading' || geoState === 'matching'}
 					<svg class="h-5 w-5 shrink-0 animate-spin text-accent" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+						/>
 					</svg>
 					<span class="text-sm">
 						{geoState === 'loading' ? 'Mendeteksi lokasi…' : 'Mencocokkan wilayah…'}
 					</span>
 				{:else if geoState === 'error'}
-					<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+					<svg
+						class="h-5 w-5 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="1.6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+						/>
 					</svg>
 					<div class="flex-1">
 						<p class="text-sm">Gagal mendeteksi</p>
 						<p class="mt-0.5 text-xs opacity-70">{geoError}</p>
 					</div>
 				{:else}
-					<svg class="h-5 w-5 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-7.58-7-12a7 7 0 1114 0c0 4.42-7 12-7 12z" />
+					<svg
+						class="h-5 w-5 shrink-0 text-accent"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="1.6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M12 21s-7-7.58-7-12a7 7 0 1114 0c0 4.42-7 12-7 12z"
+						/>
 						<circle cx="12" cy="9" r="2.5" stroke-linecap="round" stroke-linejoin="round" />
 					</svg>
 					<div class="flex-1">
@@ -280,7 +337,10 @@
 					</div>
 					<svg
 						class="h-4 w-4 shrink-0 text-ink-mute transition-transform group-hover:translate-x-0.5"
-						fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
 					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
 					</svg>
@@ -292,17 +352,25 @@
 		<div class="shrink-0 px-5 pb-3">
 			<div class="my-3 flex items-center gap-3">
 				<div class="h-px flex-1 bg-[var(--glass-line-soft)]"></div>
-				<span class="font-mono text-[10px] tracking-[0.2em] text-ink-mute uppercase">atau cari</span>
+				<span class="font-mono text-[10px] tracking-[0.2em] text-ink-mute uppercase">atau cari</span
+				>
 				<div class="h-px flex-1 bg-[var(--glass-line-soft)]"></div>
 			</div>
 
 			<div class="relative">
 				<svg
 					class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-ink-mute"
-					fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
 					aria-hidden="true"
 				>
-					<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
 				</svg>
 				<input
 					bind:this={inputEl}
@@ -321,7 +389,13 @@
 						class="absolute top-1/2 right-3 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--glass-strong)] text-ink-mute hover:text-ink"
 						aria-label="Hapus pencarian"
 					>
-						<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+						<svg
+							class="h-3 w-3"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2.5"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					</button>
@@ -331,8 +405,19 @@
 			{#if regionsStore.loading}
 				<p class="mt-2 flex items-center gap-1.5 text-xs text-ink-mute">
 					<svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+						/>
 					</svg>
 					Memuat data 91.000+ wilayah…
 				</p>
@@ -353,12 +438,24 @@
 							onclick={() => selectResult(r)}
 							class="flex w-full items-start gap-3 rounded-2xl bg-[var(--glass)] px-3.5 py-3 text-left transition-all hover:bg-[var(--glass-strong)]"
 						>
-							<svg class="mt-0.5 h-4 w-4 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-7.58-7-12a7 7 0 1114 0c0 4.42-7 12-7 12z" />
+							<svg
+								class="mt-0.5 h-4 w-4 shrink-0 text-accent"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="1.8"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M12 21s-7-7.58-7-12a7 7 0 1114 0c0 4.42-7 12-7 12z"
+								/>
 								<circle cx="12" cy="9" r="2.5" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
 							<div class="min-w-0 flex-1">
-								<p class="truncate font-display text-base text-ink leading-tight">{r.villageName}</p>
+								<p class="font-display truncate text-base leading-tight text-ink">
+									{r.villageName}
+								</p>
 								<p class="mt-0.5 truncate text-xs text-ink-mute">
 									{[r.districtName, r.regencyName, r.provinceName].filter(Boolean).join(' · ')}
 								</p>
@@ -379,17 +476,36 @@
 								<button
 									onclick={() => selectResult(r)}
 									class="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-all
-										{focusedIndex === i ? 'bg-[var(--glass-strong)] ring-1 ring-[var(--accent)]/40' : 'hover:bg-[var(--glass)]'}"
+										{focusedIndex === i
+										? 'bg-[var(--glass-strong)] ring-1 ring-[var(--accent)]/40'
+										: 'hover:bg-[var(--glass)]'}"
 									role="option"
 									aria-selected={focusedIndex === i}
 								>
-									<span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full {focusedIndex === i ? 'bg-accent' : 'bg-ink-faint'}"></span>
+									<span
+										class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full {focusedIndex === i
+											? 'bg-accent'
+											: 'bg-ink-faint'}"
+									></span>
 									<div class="min-w-0 flex-1">
-										<p class="truncate font-display text-base text-ink leading-tight">
-											{@html highlight(r.villageName, query)}
+										<p class="font-display truncate text-base leading-tight text-ink">
+											{#each highlight(r.villageName, query) as part, partIndex (partIndex)}
+												{#if part.match}
+													<mark
+														class="rounded-[2px] px-[2px] text-ink"
+														style="background: color-mix(in oklch, var(--accent) 30%, transparent);"
+													>
+														{part.text}
+													</mark>
+												{:else}
+													{part.text}
+												{/if}
+											{/each}
 										</p>
 										<p class="mt-0.5 truncate text-xs text-ink-mute">
-											{r.districtName}{r.regencyName ? ` · ${r.regencyName}` : ''}{r.provinceName ? ` · ${r.provinceName}` : ''}
+											{r.districtName}{r.regencyName ? ` · ${r.regencyName}` : ''}{r.provinceName
+												? ` · ${r.provinceName}`
+												: ''}
 										</p>
 									</div>
 								</button>
@@ -419,13 +535,28 @@
 						</div>
 						<div class="flex flex-col gap-1">
 							{#each regionsStore.recentLocations as r (r.code)}
-								<div class="group flex items-center gap-2 rounded-2xl bg-[var(--glass)] px-3.5 py-3 transition-all hover:bg-[var(--glass-strong)]">
-									<button onclick={() => selectRecent(r)} class="flex min-w-0 flex-1 items-center gap-3 text-left">
-										<svg class="h-4 w-4 shrink-0 text-ink-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+								<div
+									class="group flex items-center gap-2 rounded-2xl bg-[var(--glass)] px-3.5 py-3 transition-all hover:bg-[var(--glass-strong)]"
+								>
+									<button
+										onclick={() => selectRecent(r)}
+										class="flex min-w-0 flex-1 items-center gap-3 text-left"
+									>
+										<svg
+											class="h-4 w-4 shrink-0 text-ink-mute"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="1.8"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
 										</svg>
 										<div class="min-w-0 flex-1">
-											<p class="truncate font-display text-base text-ink leading-tight">{r.name}</p>
+											<p class="font-display truncate text-base leading-tight text-ink">{r.name}</p>
 											<p class="truncate text-xs text-ink-mute">{r.subName}</p>
 										</div>
 									</button>
@@ -434,8 +565,18 @@
 										class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-ink-mute opacity-0 transition-all group-hover:opacity-100 hover:bg-[var(--glass-strong)] hover:text-ink"
 										aria-label="Hapus {r.name}"
 									>
-										<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+										<svg
+											class="h-3.5 w-3.5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="2"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M6 18L18 6M6 6l12 12"
+											/>
 										</svg>
 									</button>
 								</div>
@@ -446,7 +587,7 @@
 
 				<div class="rounded-2xl border border-[var(--glass-line-soft)] px-4 py-4">
 					<p class="font-mono text-[10px] tracking-[0.2em] text-ink-mute uppercase">Tip</p>
-					<p class="mt-2 text-sm text-ink-soft leading-relaxed">
+					<p class="mt-2 text-sm leading-relaxed text-ink-soft">
 						91.000+ wilayah Indonesia. Ketik nama kelurahan untuk mulai. Gunakan
 						<span class="font-mono text-xs text-ink">↑↓</span> untuk navigasi.
 					</p>

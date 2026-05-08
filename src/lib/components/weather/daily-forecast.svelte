@@ -32,7 +32,7 @@
 	</div>
 
 	<ul class="px-2 pt-2 pb-3 sm:px-3 sm:pb-4">
-		{#each days as day, i (day.dateStr)}
+		{#each days as day (day.dateStr)}
 			{@const isToday = day.dateStr === new Date().toISOString().slice(0, 10)}
 			{@const isExpanded = expandedDate === day.dateStr}
 			{@const span = Math.max(1, range.hi - range.lo)}
@@ -52,9 +52,7 @@
 					/>
 
 					<div class="min-w-0">
-						<p
-							class="font-display text-lg leading-tight {isToday ? 'text-accent' : 'text-ink'}"
-						>
+						<p class="font-display text-lg leading-tight {isToday ? 'text-accent' : 'text-ink'}">
 							{isToday ? 'Hari ini' : day.label}
 						</p>
 						<p class="truncate text-xs text-ink-mute">{day.dominantWeather}</p>
@@ -84,7 +82,7 @@
 								>
 									<span class="font-mono text-[10px] text-ink-mute">{h.timeStr}</span>
 									<WeatherIcon category={h.category} date={h.datetime} size={24} />
-									<span class="font-display text-sm text-ink leading-none">
+									<span class="font-display text-sm leading-none text-ink">
 										{h.temperature}°
 									</span>
 								</div>

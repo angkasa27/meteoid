@@ -35,19 +35,17 @@
 		</div>
 
 		<!-- Location, big serif italic -->
-		<h1 class="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl md:text-6xl">
+		<h1 class="font-display mt-3 text-4xl leading-[1.05] sm:text-5xl md:text-6xl">
 			<span class="text-balance text-ink">{locationName}</span>
 			{#if locationSubName}
-				<span class="block text-base font-sans tracking-tight text-ink-mute mt-1 not-italic">
+				<span class="mt-1 block font-sans text-base tracking-tight text-ink-mute not-italic">
 					{locationSubName}
 				</span>
 			{/if}
 		</h1>
 
 		<!-- Hero composition: temp on left, condition + icon on right -->
-		<div
-			class="mt-8 grid grid-cols-1 items-end gap-6 md:mt-12 md:grid-cols-[1fr_auto] md:gap-12"
-		>
+		<div class="mt-8 grid grid-cols-1 items-end gap-6 md:mt-12 md:grid-cols-[1fr_auto] md:gap-12">
 			<!-- Temperature -->
 			<div class="flex items-start gap-1">
 				<span
@@ -57,7 +55,7 @@
 					{current.temperature}
 				</span>
 				<span
-					class="mt-3 font-display text-4xl leading-none text-ink-soft sm:mt-4 sm:text-5xl md:mt-6 md:text-6xl"
+					class="font-display mt-3 text-4xl leading-none text-ink-soft sm:mt-4 sm:text-5xl md:mt-6 md:text-6xl"
 				>
 					°
 				</span>
@@ -85,32 +83,24 @@
 		</div>
 
 		<!-- Hairline + at-a-glance row -->
-		<div class="mt-10 divider"></div>
-		<dl
-			class="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-3 md:max-w-2xl md:gap-10"
-		>
+		<div class="divider mt-10"></div>
+		<dl class="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-3 md:max-w-2xl md:gap-10">
 			<div>
-				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
-					Kelembapan
-				</dt>
-				<dd class="mt-2 font-display text-3xl text-ink sm:text-4xl">
+				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">Kelembapan</dt>
+				<dd class="font-display mt-2 text-3xl text-ink sm:text-4xl">
 					{current.humidity}<span class="text-base text-ink-mute">%</span>
 				</dd>
 			</div>
 			<div>
-				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
-					Angin
-				</dt>
-				<dd class="mt-2 font-display text-3xl text-ink sm:text-4xl">
+				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">Angin</dt>
+				<dd class="font-display mt-2 text-3xl text-ink sm:text-4xl">
 					{current.windSpeedKmh}<span class="text-base text-ink-mute">&nbsp;km/j</span>
 				</dd>
 				<p class="mt-0.5 text-xs text-ink-mute">{windDir}</p>
 			</div>
 			<div>
-				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
-					Knots
-				</dt>
-				<dd class="mt-2 font-display text-3xl text-ink sm:text-4xl">
+				<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">Knots</dt>
+				<dd class="font-display mt-2 text-3xl text-ink sm:text-4xl">
 					{current.windSpeedKnots}<span class="text-base text-ink-mute">&nbsp;kn</span>
 				</dd>
 			</div>

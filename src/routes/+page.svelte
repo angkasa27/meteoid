@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { regionsStore } from '$lib/stores/regions.svelte.js';
 	import { getSkyKey } from '$lib/sky.js';
 
@@ -13,22 +14,18 @@
 	import Skeleton from '$lib/components/ui/skeleton.svelte';
 	import Footer from '$lib/components/layout/footer.svelte';
 
-	import { onMount } from 'svelte';
-
 	let { data }: { data: PageData } = $props();
 
 	let drawerOpen = $state(false);
 	let isNavigating = $state(false);
 
-	onMount(() => regionsStore.load());
-
-	const locationLabel = $derived(() => {
+	const locationLabel = $derived.by(() => {
 		const recent = regionsStore.recentLocations.find((r) => r.code === data.selectedCode);
 		if (recent) return recent.name;
 		return 'Pilih Lokasi';
 	});
 
-	const locationSubLabel = $derived(() => {
+	const locationSubLabel = $derived.by(() => {
 		const recent = regionsStore.recentLocations.find((r) => r.code === data.selectedCode);
 		if (recent) return recent.subName;
 		return data.selectedCode;
@@ -57,19 +54,18 @@
 </script>
 
 <svelte:head>
-	<title>Meteoid — {locationLabel()}</title>
+	<title>Meteoid — {locationLabel}</title>
 	<meta
 		name="description"
-		content="Prakiraan cuaca akurat untuk {locationLabel()} dari BMKG Indonesia. Pantau kondisi cuaca terkini, suhu, dan peringatan cuaca."
+		content="Prakiraan cuaca akurat untuk {locationLabel} dari BMKG Indonesia. Pantau kondisi cuaca terkini, suhu, dan peringatan cuaca."
 	/>
 </svelte:head>
 
 <!-- ── Top bar: minimal, floats over the cinematic background ────────────── -->
 <header class="relative z-30">
 	<div class="mx-auto flex max-w-6xl items-center gap-3 px-5 pt-5 sm:px-8 sm:pt-7">
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a
-			href="/"
+			href={resolve('/')}
 			class="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80"
 			aria-label="Meteoid home"
 		>
@@ -81,7 +77,7 @@
 			<button
 				onclick={() => (drawerOpen = true)}
 				class="glass-soft flex items-center gap-2 rounded-full px-3.5 py-2 text-xs text-ink-soft transition-all hover:bg-[var(--glass)] hover:text-ink sm:text-sm"
-				aria-label="Pilih lokasi: {locationLabel()}"
+				aria-label="Pilih lokasi: {locationLabel}"
 			>
 				<svg
 					class="h-3.5 w-3.5 text-accent"
@@ -98,7 +94,7 @@
 					/>
 					<circle cx="12" cy="9" r="2.5" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
-				<span class="max-w-[10rem] truncate sm:max-w-[18rem]">{locationLabel()}</span>
+				<span class="max-w-[10rem] truncate sm:max-w-[18rem]">{locationLabel}</span>
 				<svg class="h-3 w-3 text-ink-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path
 						stroke-linecap="round"
@@ -163,8 +159,8 @@
 	{:else}
 		<CurrentWeather
 			current={currentWeather}
-			locationName={locationLabel()}
-			locationSubName={locationSubLabel()}
+			locationName={locationLabel}
+			locationSubName={locationSubLabel}
 		/>
 
 		<div class="mt-2 flex flex-col gap-6">
@@ -195,7 +191,6 @@
 <Footer />
 
 <LocationDrawer
-	currentCode={data.selectedCode}
 	onSelect={handleLocationSelect}
 	open={drawerOpen}
 	onClose={() => (drawerOpen = false)}

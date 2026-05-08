@@ -23,7 +23,8 @@
 
 	// Build smooth area chart for next 24h
 	const chart = $derived.by(() => {
-		if (!next24.length) return { line: '', area: '', dots: [] as { x: number; y: number; t: number }[] };
+		if (!next24.length)
+			return { line: '', area: '', dots: [] as { x: number; y: number; t: number }[] };
 		const W = 280;
 		const H = 80;
 		const PAD = 8;
@@ -36,7 +37,9 @@
 			const y = PAD + (1 - (t - min) / range) * (H - PAD * 2);
 			return { x, y, t };
 		});
-		const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+		const line = pts
+			.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+			.join(' ');
 		const area = `${line} L ${pts[pts.length - 1].x} ${H} L ${pts[0].x} ${H} Z`;
 		return { line, area, dots: pts };
 	});
@@ -92,7 +95,7 @@
 						Kelembapan
 					</dt>
 				</div>
-				<dd class="mt-2 font-display text-3xl text-ink leading-none">
+				<dd class="font-display mt-2 text-3xl leading-none text-ink">
 					{latest.humidity}<span class="text-sm text-ink-mute">%</span>
 				</dd>
 				<div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-[var(--glass-line-soft)]">
@@ -103,11 +106,9 @@
 			<div class="rounded-2xl bg-[var(--glass)] p-3.5">
 				<div class="flex items-center gap-2">
 					<img src="{base}/icons/weather/wind.svg" alt="" class="h-5 w-5" />
-					<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
-						Angin
-					</dt>
+					<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">Angin</dt>
 				</div>
-				<dd class="mt-2 font-display text-3xl text-ink leading-none">
+				<dd class="font-display mt-2 text-3xl leading-none text-ink">
 					{latest.windSpeedKmh}<span class="text-sm text-ink-mute"> km/j</span>
 				</dd>
 				<p class="mt-2 text-xs text-ink-mute">
@@ -118,12 +119,14 @@
 			<div class="rounded-2xl bg-[var(--glass)] p-3.5">
 				<div class="flex items-center gap-2">
 					<img src="{base}/icons/weather/compass.svg" alt="" class="h-5 w-5" />
-					<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">
-						Arah
-					</dt>
+					<dt class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">Arah</dt>
 				</div>
-				<dd class="mt-2 flex items-center gap-2 font-display text-2xl text-ink leading-none">
-					<svg viewBox="0 0 24 24" class="h-6 w-6 text-accent" style="transform: rotate({latest.windDegrees}deg);">
+				<dd class="font-display mt-2 flex items-center gap-2 text-2xl leading-none text-ink">
+					<svg
+						viewBox="0 0 24 24"
+						class="h-6 w-6 text-accent"
+						style="transform: rotate({latest.windDegrees}deg);"
+					>
 						<path d="M12 3 L15 14 L12 12 L9 14 Z" fill="currentColor" />
 					</svg>
 					{latest.windDegrees}°
@@ -138,14 +141,18 @@
 						Titik embun
 					</dt>
 				</div>
-				<dd class="mt-2 font-display text-3xl text-ink leading-none">
-					{Math.round(latest.temperature - (100 - latest.humidity) / 5)}<span class="text-sm text-ink-mute">°C</span>
+				<dd class="font-display mt-2 text-3xl leading-none text-ink">
+					{Math.round(latest.temperature - (100 - latest.humidity) / 5)}<span
+						class="text-sm text-ink-mute">°C</span
+					>
 				</dd>
 				<p class="mt-2 text-xs text-ink-mute">Rasa kondensasi</p>
 			</div>
 		</dl>
 
-		<div class="mt-4 flex items-center justify-between rounded-2xl bg-[var(--glass)] px-4 py-3 text-xs">
+		<div
+			class="mt-4 flex items-center justify-between rounded-2xl bg-[var(--glass)] px-4 py-3 text-xs"
+		>
 			<div>
 				<p class="text-ink-mute">Rata-rata kelembapan</p>
 				<p class="font-mono text-ink-soft">{avgHumidity}%</p>

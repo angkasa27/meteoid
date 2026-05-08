@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import type { WeatherAlert } from '$lib/types.js';
 	import { slide } from 'svelte/transition';
 
@@ -8,20 +9,18 @@
 
 	let { alerts }: Props = $props();
 
-	let dismissed = $state(new Set<string>());
-	let expanded = $state(new Set<string>());
+	let dismissed = new SvelteSet<string>();
+	let expanded = new SvelteSet<string>();
 
 	const visible = $derived(alerts.filter((a) => !dismissed.has(a.id)));
 
 	const dismiss = (id: string) => {
-		dismissed = new Set([...dismissed, id]);
+		dismissed.add(id);
 	};
 
 	const toggleExpand = (id: string) => {
-		const next = new Set(expanded);
-		if (next.has(id)) next.delete(id);
-		else next.add(id);
-		expanded = next;
+		if (expanded.has(id)) expanded.delete(id);
+		else expanded.add(id);
 	};
 
 	const accent: Record<string, string> = {
@@ -59,7 +58,7 @@
 						aria-expanded={expanded.has(alert.id)}
 						onclick={() => toggleExpand(alert.id)}
 					>
-						<span class="truncate font-display text-lg text-ink">{alert.title}</span>
+						<span class="font-display truncate text-lg text-ink">{alert.title}</span>
 						<svg
 							class="ml-auto h-4 w-4 shrink-0 text-ink-mute transition-transform duration-200 {expanded.has(
 								alert.id
@@ -80,7 +79,13 @@
 						onclick={() => dismiss(alert.id)}
 						aria-label="Tutup peringatan {alert.title}"
 					>
-						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<svg
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					</button>
@@ -89,9 +94,7 @@
 				{#if expanded.has(alert.id)}
 					<div transition:slide={{ duration: 220 }} class="px-4 pb-4">
 						<p class="text-sm text-ink-soft">{alert.description}</p>
-						<div
-							class="mt-3 rounded-xl bg-[var(--glass)] p-3 text-xs text-ink-mute"
-						>
+						<div class="mt-3 rounded-xl bg-[var(--glass)] p-3 text-xs text-ink-mute">
 							<span
 								class="font-mono text-[10px] tracking-[0.18em] uppercase"
 								style="color: {accent[alert.severity]};"
