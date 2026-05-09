@@ -27,8 +27,8 @@
 
 <GlassCard padding="none">
 	<div class="flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6">
-		<h2 class="font-display text-2xl text-ink">Tujuh hari</h2>
-		<span class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">7d</span>
+		<h2 class="font-display text-2xl text-ink">Tiga hari</h2>
+		<span class="font-mono text-[10px] tracking-[0.18em] text-ink-mute uppercase">3d</span>
 	</div>
 
 	<ul class="px-2 pt-2 pb-3 sm:px-3 sm:pb-4">
